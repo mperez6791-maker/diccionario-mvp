@@ -1,0 +1,396 @@
+[
+  {
+    "id": "w001",
+    "es": {
+      "word": "Acedía",
+      "def": "Desgano persistente que vuelve tediosas tareas que antes resultaban fáciles."
+    },
+    "en": {
+      "word": "Acedia",
+      "def": "A lingering apathy that makes once-simple tasks feel heavy and dull."
+    },
+    "difficulty": 3,
+    "tags": [
+      "mood",
+      "classic"
+    ]
+  },
+  {
+    "id": "w002",
+    "es": {
+      "word": "Bisliz",
+      "def": "Giro mínimo y casi imperceptible en la dirección de algo en movimiento."
+    },
+    "en": {
+      "word": "Bisliz",
+      "def": "A tiny, almost unnoticeable change in the direction of something moving."
+    },
+    "difficulty": 2,
+    "tags": [
+      "motion"
+    ]
+  },
+  {
+    "id": "w003",
+    "es": {
+      "word": "Crisálida",
+      "def": "Etapa inmóvil de ciertos insectos en la que ocurre la metamorfosis."
+    },
+    "en": {
+      "word": "Chrysalis",
+      "def": "A still stage of certain insects during which metamorphosis occurs."
+    },
+    "difficulty": 1,
+    "tags": [
+      "nature"
+    ]
+  },
+  {
+    "id": "w004",
+    "es": {
+      "word": "Deliquescente",
+      "def": "Que tiende a disolverse al absorber humedad del aire."
+    },
+    "en": {
+      "word": "Deliquescent",
+      "def": "Tending to dissolve by absorbing moisture from the air."
+    },
+    "difficulty": 3,
+    "tags": [
+      "science"
+    ]
+  },
+  {
+    "id": "w005",
+    "es": {
+      "word": "Ecdótica",
+      "def": "Disciplina que reconstruye textos a partir de manuscritos y variantes."
+    },
+    "en": {
+      "word": "Ecdotics",
+      "def": "The discipline of reconstructing texts from manuscripts and variants."
+    },
+    "difficulty": 4,
+    "tags": [
+      "books",
+      "history"
+    ]
+  },
+  {
+    "id": "w006",
+    "es": {
+      "word": "Flebótomo",
+      "def": "Insecto hematófago de tamaño pequeño, frecuente en zonas cálidas."
+    },
+    "en": {
+      "word": "Phlebotomine",
+      "def": "A small blood-feeding insect common in warm regions."
+    },
+    "difficulty": 4,
+    "tags": [
+      "nature"
+    ]
+  },
+  {
+    "id": "w007",
+    "es": {
+      "word": "Gnomon",
+      "def": "Pieza que proyecta sombra en un reloj de sol para indicar la hora."
+    },
+    "en": {
+      "word": "Gnomon",
+      "def": "The part of a sundial that casts the shadow used to tell time."
+    },
+    "difficulty": 3,
+    "tags": [
+      "history",
+      "science"
+    ]
+  },
+  {
+    "id": "w008",
+    "es": {
+      "word": "Hialino",
+      "def": "Muy transparente o de apariencia vidriosa."
+    },
+    "en": {
+      "word": "Hyaline",
+      "def": "Very transparent; glasslike in appearance."
+    },
+    "difficulty": 2,
+    "tags": [
+      "descriptive"
+    ]
+  },
+  {
+    "id": "w009",
+    "es": {
+      "word": "Inmarcesible",
+      "def": "Que no se marchita o no pierde vigor con el tiempo."
+    },
+    "en": {
+      "word": "Immarchable",
+      "def": "Not withering; not losing vigor with time."
+    },
+    "difficulty": 3,
+    "tags": [
+      "descriptive"
+    ]
+  },
+  {
+    "id": "w010",
+    "es": {
+      "word": "Jactancia",
+      "def": "Alarde excesivo sobre méritos reales o supuestos."
+    },
+    "en": {
+      "word": "Braggadocio",
+      "def": "Excessive boasting about real or supposed achievements."
+    },
+    "difficulty": 2,
+    "tags": [
+      "behavior"
+    ]
+  },
+  {
+    "id": "w011",
+    "es": {
+      "word": "Kintsugi",
+      "def": "Técnica japonesa que repara cerámica resaltando las grietas con metal."
+    },
+    "en": {
+      "word": "Kintsugi",
+      "def": "A Japanese technique of mending pottery by highlighting cracks with metal."
+    },
+    "difficulty": 2,
+    "tags": [
+      "culture"
+    ]
+  },
+  {
+    "id": "w012",
+    "es": {
+      "word": "Limerencia",
+      "def": "Estado de enamoramiento obsesivo con necesidad intensa de reciprocidad."
+    },
+    "en": {
+      "word": "Limerence",
+      "def": "An obsessive infatuation marked by an intense need for reciprocation."
+    },
+    "difficulty": 2,
+    "tags": [
+      "mood"
+    ]
+  },
+  {
+    "id": "w013",
+    "es": {
+      "word": "Mancebía",
+      "def": "Casa o lugar donde se ejercía la prostitución en épocas pasadas."
+    },
+    "en": {
+      "word": "Brothelry",
+      "def": "A house or place where prostitution was carried out in former times."
+    },
+    "difficulty": 4,
+    "tags": [
+      "history"
+    ]
+  },
+  {
+    "id": "w014",
+    "es": {
+      "word": "Nictálope",
+      "def": "Que ve mejor en la penumbra o de noche que a pleno día."
+    },
+    "en": {
+      "word": "Nyctalopic",
+      "def": "Seeing better in dim light or at night than in full daylight."
+    },
+    "difficulty": 4,
+    "tags": [
+      "biology"
+    ]
+  },
+  {
+    "id": "w015",
+    "es": {
+      "word": "Onírico",
+      "def": "Relativo a los sueños o con cualidad de sueño."
+    },
+    "en": {
+      "word": "Oneiric",
+      "def": "Relating to dreams; dreamlike."
+    },
+    "difficulty": 2,
+    "tags": [
+      "descriptive"
+    ]
+  },
+  {
+    "id": "w016",
+    "es": {
+      "word": "Petrícor",
+      "def": "Olor característico de la tierra después de la lluvia."
+    },
+    "en": {
+      "word": "Petrichor",
+      "def": "The distinctive smell of earth after rain."
+    },
+    "difficulty": 1,
+    "tags": [
+      "nature"
+    ]
+  },
+  {
+    "id": "w017",
+    "es": {
+      "word": "Quididad",
+      "def": "Conjunto de rasgos que hacen que algo sea lo que es."
+    },
+    "en": {
+      "word": "Quiddity",
+      "def": "The set of features that make something what it is."
+    },
+    "difficulty": 3,
+    "tags": [
+      "philosophy"
+    ]
+  },
+  {
+    "id": "w018",
+    "es": {
+      "word": "Rubicundo",
+      "def": "De color rojo intenso, especialmente en el rostro."
+    },
+    "en": {
+      "word": "Rubicund",
+      "def": "Reddish in color, especially of the face."
+    },
+    "difficulty": 2,
+    "tags": [
+      "descriptive"
+    ]
+  },
+  {
+    "id": "w019",
+    "es": {
+      "word": "Sempiterno",
+      "def": "Que dura sin fin o parece no tener término."
+    },
+    "en": {
+      "word": "Sempiternal",
+      "def": "Everlasting; seemingly without end."
+    },
+    "difficulty": 2,
+    "tags": [
+      "descriptive"
+    ]
+  },
+  {
+    "id": "w020",
+    "es": {
+      "word": "Tautología",
+      "def": "Repetición innecesaria de una idea con otras palabras."
+    },
+    "en": {
+      "word": "Tautology",
+      "def": "Unnecessary repetition of an idea in different words."
+    },
+    "difficulty": 1,
+    "tags": [
+      "language"
+    ]
+  },
+  {
+    "id": "w021",
+    "es": {
+      "word": "Ucronía",
+      "def": "Relato que imagina una historia alternativa a la real."
+    },
+    "en": {
+      "word": "Uchronia",
+      "def": "A narrative that imagines an alternate history."
+    },
+    "difficulty": 3,
+    "tags": [
+      "culture",
+      "history"
+    ]
+  },
+  {
+    "id": "w022",
+    "es": {
+      "word": "Veleidad",
+      "def": "Inconstancia en deseos o propósitos; capricho pasajero."
+    },
+    "en": {
+      "word": "Velleity",
+      "def": "A fleeting wish or capricious inclination without firm commitment."
+    },
+    "difficulty": 4,
+    "tags": [
+      "behavior"
+    ]
+  },
+  {
+    "id": "w023",
+    "es": {
+      "word": "Wabi-sabi",
+      "def": "Estética que aprecia lo imperfecto, lo simple y lo transitorio."
+    },
+    "en": {
+      "word": "Wabi-sabi",
+      "def": "An aesthetic that values imperfection, simplicity, and transience."
+    },
+    "difficulty": 2,
+    "tags": [
+      "culture"
+    ]
+  },
+  {
+    "id": "w024",
+    "es": {
+      "word": "Xilografía",
+      "def": "Técnica de grabado que imprime usando planchas de madera tallada."
+    },
+    "en": {
+      "word": "Woodcut",
+      "def": "A printmaking technique using carved wooden blocks."
+    },
+    "difficulty": 2,
+    "tags": [
+      "art"
+    ]
+  },
+  {
+    "id": "w025",
+    "es": {
+      "word": "Yuyal",
+      "def": "Terreno cubierto de yuyos o malezas."
+    },
+    "en": {
+      "word": "Weedland",
+      "def": "A patch of land overgrown with weeds."
+    },
+    "difficulty": 2,
+    "tags": [
+      "nature"
+    ]
+  },
+  {
+    "id": "w026",
+    "es": {
+      "word": "Zahorí",
+      "def": "Persona a la que se atribuye capacidad de hallar agua o vetas ocultas."
+    },
+    "en": {
+      "word": "Dowser",
+      "def": "A person believed to find hidden water or minerals using a rod or intuition."
+    },
+    "difficulty": 2,
+    "tags": [
+      "culture"
+    ]
+  }
+]
