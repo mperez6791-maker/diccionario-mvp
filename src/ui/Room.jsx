@@ -218,7 +218,7 @@ export default function Room({ uid, roomId, onExit }){
                     </div>
                   )}
 
-                  {isHost && (
+                  {isReader && (
                     <div style={{ marginTop: 12 }}>
                       <button className="secondary" disabled={busy} onClick={doOpenVoting}>
                         Open voting
@@ -234,22 +234,28 @@ export default function Room({ uid, roomId, onExit }){
               {room.status === PHASE.VOTING && (
                 <div style={{ marginTop: 12 }}>
                   <div className="muted" style={{ marginBottom: 10 }}>
-                    Vote for the REAL definition. You can’t vote your own.
+                    {isReader
+                      ? "You are the reader. Read the options aloud while others vote."
+                      : "Vote for the REAL definition. You can’t vote your own."}
                   </div>
+
                   {options.map((o, idx) => {
                     const isMine = o.choiceId === uid;
-                    const disabled = isMine || busy || (!!myVote && myVote !== o.choiceId);
                     const checked = myVote === o.choiceId;
                     return (
                       <div key={o.choiceId} className="option" style={{ opacity: isMine ? .55 : 1, marginBottom: 10 }}>
                         <div>
-                          <input
-                            type="radio"
-                            name="vote"
-                            checked={checked}
-                            disabled={isMine}
-                            onChange={() => doVote(o.choiceId)}
-                          />
+                          {isReader ? (
+                            <div style={{ width: 18 }} />
+                          ) : (
+                            <input
+                              type="radio"
+                              name="vote"
+                              checked={checked}
+                              disabled={isMine || busy}
+                              onChange={() => doVote(o.choiceId)}
+                            />
+                          )}
                         </div>
                         <div>
                           <strong>Option {idx+1}{isMine ? " (yours)" : ""}</strong>
@@ -259,9 +265,9 @@ export default function Room({ uid, roomId, onExit }){
                     );
                   })}
 
-                  <div className="muted">Votes: {votes.length}/{players.length}</div>
+                  <div className="muted">Votes: {votes.length}/{Math.max(0, players.length - 1)}</div>
 
-                  {isHost && (
+                  {isReader && (
                     <div style={{ marginTop: 12 }}>
                       <button className="secondary" disabled={busy} onClick={doReveal}>
                         Reveal + Score
@@ -294,7 +300,7 @@ export default function Room({ uid, roomId, onExit }){
                     </ul>
                   </div>
 
-                  {isHost && (
+                  {isReader && (
                     <div style={{ marginTop: 12 }}>
                       <button disabled={busy} onClick={doNext}>
                         Next round

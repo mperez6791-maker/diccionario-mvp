@@ -49,6 +49,7 @@ export async function createRoom({ hostUid, hostName, targetScore=50, langMode="
     roundIndex: 0,
     readerIndex: 0,
     playerOrder: [hostUid],
+    usedWordIds: [],
     createdAt: serverTimestamp(),
     lastUpdatedAt: serverTimestamp(),
   });
@@ -167,7 +168,12 @@ export async function createNextRound(roomId){
     const readerUid = playerOrder[readerIndex % playerOrder.length];
 
     const lang = chooseLang(room.langMode || "both", roundIndex);
-    const chosen = pickRandom(WORDS);
+
+    // Avoid repeating words within the same room until we exhaust the pack.
+    const used = Array.isArray(room.usedWordIds) ? room.usedWordIds : [];
+    const unused = WORDS.filter(w => !used.includes(w.id));
+    const pool = unused.length ? unused : WORDS;
+    const chosen = pickRandom(pool);
     const wd = wordForLang(chosen, lang);
 
     const roundsCol = collection(db, "rooms", roomId, "rounds");
@@ -185,11 +191,14 @@ export async function createNextRound(roomId){
       createdAt: serverTimestamp(),
     });
 
+    const nextUsed = (unused.length ? [...used, chosen.id] : [chosen.id]);
+
     tx.update(roomRef, {
       status: PHASE.WRITING,
       roundIndex: roundIndex + 1,
       readerIndex: (readerIndex + 1) % playerOrder.length,
       currentRoundId: roundId,
+      usedWordIds: nextUsed,
       lastUpdatedAt: serverTimestamp(),
     });
   });
@@ -200,7 +209,7 @@ export async function submitDefinition(roomId, roundId, uid, text){
   await setDoc(ref, { text: (text || "").trim(), submittedAt: serverTimestamp() }, { merge: true });
 }
 
-export async function openVoting(roomId, roundId, hostUid){
+export async function openVoting(roomId, roundId, actorUid){
   const roomRef = doc(db, "rooms", roomId);
   const roundRef = doc(db, "rooms", roomId, "rounds", roundId);
   await runTransaction(db, async (tx) => {
@@ -209,7 +218,7 @@ export async function openVoting(roomId, roundId, hostUid){
     if (!roomSnap.exists() || !roundSnap.exists()) throw new Error("Missing room/round");
     const room = roomSnap.data();
     const round = roundSnap.data();
-    if (room.hostUid !== hostUid) throw new Error("Only host can advance");
+    if (round.readerUid !== actorUid) throw new Error("Only the reader can open voting");
     if (round.phase !== PHASE.WRITING) return;
 
     tx.update(roundRef, { phase: PHASE.VOTING });
@@ -218,12 +227,16 @@ export async function openVoting(roomId, roundId, hostUid){
 }
 
 export async function castVote(roomId, roundId, uid, choiceId){
+  // MVP guard: reader doesn't vote
+  const roundSnap = await getDoc(doc(db, "rooms", roomId, "rounds", roundId));
+  if (roundSnap.exists() && roundSnap.data()?.readerUid === uid){
+    throw new Error("Reader cannot vote this round.");
+  }
   const ref = doc(db, "rooms", roomId, "rounds", roundId, "votes", uid);
   await setDoc(ref, { choiceId, votedAt: serverTimestamp() }, { merge: true });
 }
-
-export async function revealAndScore(roomId, roundId, hostUid){
-  // Host computes options, checks votes, updates scores.
+export async function revealAndScore(roomId, roundId, actorUid){
+  // Reader computes options, checks votes, updates scores.
   const roomRef = doc(db, "rooms", roomId);
   const roundRef = doc(db, "rooms", roomId, "rounds", roundId);
 
@@ -233,7 +246,7 @@ export async function revealAndScore(roomId, roundId, hostUid){
     if (!roomSnap.exists() || !roundSnap.exists()) throw new Error("Missing room/round");
     const room = roomSnap.data();
     const round = roundSnap.data();
-    if (room.hostUid !== hostUid) throw new Error("Only host can reveal/score");
+    if (round.readerUid !== actorUid) throw new Error("Only the reader can reveal/score");
     if (round.phase !== PHASE.VOTING) return;
 
     const subsCol = collection(db, "rooms", roomId, "rounds", roundId, "submissions");
@@ -289,8 +302,9 @@ export async function revealAndScore(roomId, roundId, hostUid){
   });
 }
 
-export async function nextOrFinish(roomId, hostUid){
+export async function nextOrFinish(roomId, actorUid){
   const roomRef = doc(db, "rooms", roomId);
+
   // decide if anyone reached targetScore
   const playersSnap = await getDocs(collection(db, "rooms", roomId, "players"));
   let winner = null;
@@ -306,12 +320,21 @@ export async function nextOrFinish(roomId, hostUid){
   const roomSnap = await getDoc(roomRef);
   const target = roomSnap.data()?.targetScore ?? 50;
 
+  // Reader (of the current round) advances. Host is also allowed as a fallback (MVP).
+  const currentRoundId = roomSnap.data()?.currentRoundId;
+  let currentReaderUid = null;
+  if (currentRoundId){
+    const rSnap = await getDoc(doc(db, "rooms", roomId, "rounds", currentRoundId));
+    currentReaderUid = rSnap.exists() ? rSnap.data()?.readerUid : null;
+  }
+
+  const canAdvance = actorUid === roomSnap.data()?.hostUid || (currentReaderUid && actorUid === currentReaderUid);
+  if (!canAdvance) throw new Error("Only the reader can advance to the next round.");
+
   if (top >= target){
     await runTransaction(db, async (tx) => {
       const r = await tx.get(roomRef);
       if (!r.exists()) return;
-      const room = r.data();
-      if (room.hostUid !== hostUid) throw new Error("Only host can finish");
       tx.update(roomRef, { status: PHASE.FINISHED, winnerUid: winner?.uid || null, lastUpdatedAt: serverTimestamp() });
     });
     return { finished: true, winner };

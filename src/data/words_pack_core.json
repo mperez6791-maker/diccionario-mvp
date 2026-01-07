@@ -392,5 +392,1701 @@
     "tags": [
       "culture"
     ]
+  },
+  {
+    "id": "w027",
+    "es": {
+      "word": "Abstruso",
+      "def": "Difícil de entender por su complejidad o falta de claridad."
+    },
+    "en": {
+      "word": "Abstruse",
+      "def": "Hard to understand because it is complex or obscure."
+    },
+    "difficulty": 3,
+    "tags": [
+      "language",
+      "thinking"
+    ]
+  },
+  {
+    "id": "w028",
+    "es": {
+      "word": "Ataraxia",
+      "def": "Estado de calma imperturbable, sin ansiedad ni agitación."
+    },
+    "en": {
+      "word": "Ataraxia",
+      "def": "A state of untroubled calm, free from anxiety or disturbance."
+    },
+    "difficulty": 3,
+    "tags": [
+      "mood",
+      "classic"
+    ]
+  },
+  {
+    "id": "w029",
+    "es": {
+      "word": "Apofenia",
+      "def": "Tendencia a ver patrones o conexiones con sentido en datos aleatorios."
+    },
+    "en": {
+      "word": "Apophenia",
+      "def": "The tendency to perceive meaningful patterns in random data."
+    },
+    "difficulty": 3,
+    "tags": [
+      "mind",
+      "science"
+    ]
+  },
+  {
+    "id": "w030",
+    "es": {
+      "word": "Pareidolia",
+      "def": "Ilusión de reconocer formas conocidas (caras, figuras) en estímulos vagos."
+    },
+    "en": {
+      "word": "Pareidolia",
+      "def": "The illusion of recognizing familiar forms (like faces) in vague stimuli."
+    },
+    "difficulty": 2,
+    "tags": [
+      "mind",
+      "perception"
+    ]
+  },
+  {
+    "id": "w031",
+    "es": {
+      "word": "Petricor",
+      "def": "Olor característico de la tierra mojada después de la lluvia."
+    },
+    "en": {
+      "word": "Petrichor",
+      "def": "The distinctive scent of dry earth after rain."
+    },
+    "difficulty": 2,
+    "tags": [
+      "nature",
+      "senses"
+    ]
+  },
+  {
+    "id": "w032",
+    "es": {
+      "word": "Limerencia",
+      "def": "Enamoramiento obsesivo e involuntario, con fuerte necesidad de reciprocidad."
+    },
+    "en": {
+      "word": "Limerence",
+      "def": "An involuntary obsessive infatuation with a strong need for reciprocation."
+    },
+    "difficulty": 3,
+    "tags": [
+      "mood",
+      "relationships"
+    ]
+  },
+  {
+    "id": "w033",
+    "es": {
+      "word": "Evanescente",
+      "def": "Que se desvanece rápido; fugaz."
+    },
+    "en": {
+      "word": "Evanescent",
+      "def": "Quickly fading; fleeting."
+    },
+    "difficulty": 2,
+    "tags": [
+      "language",
+      "poetic"
+    ]
+  },
+  {
+    "id": "w034",
+    "es": {
+      "word": "Inmarcesible",
+      "def": "Que no se marchita ni pierde frescura con el tiempo."
+    },
+    "en": {
+      "word": "Unfading",
+      "def": "Not withering or losing freshness over time."
+    },
+    "difficulty": 3,
+    "tags": [
+      "poetic",
+      "nature"
+    ]
+  },
+  {
+    "id": "w035",
+    "es": {
+      "word": "Tautología",
+      "def": "Repetición de una idea con palabras distintas, sin aportar información nueva."
+    },
+    "en": {
+      "word": "Tautology",
+      "def": "A needless repetition of an idea in different words."
+    },
+    "difficulty": 2,
+    "tags": [
+      "language",
+      "logic"
+    ]
+  },
+  {
+    "id": "w036",
+    "es": {
+      "word": "Anacronismo",
+      "def": "Elemento fuera de su tiempo histórico; algo ubicado en una época incorrecta."
+    },
+    "en": {
+      "word": "Anachronism",
+      "def": "Something placed in the wrong historical time period."
+    },
+    "difficulty": 2,
+    "tags": [
+      "history",
+      "language"
+    ]
+  },
+  {
+    "id": "w037",
+    "es": {
+      "word": "Ecléctico",
+      "def": "Que toma ideas o estilos de fuentes diversas y los combina."
+    },
+    "en": {
+      "word": "Eclectic",
+      "def": "Drawing from diverse sources or styles; mixed by selection."
+    },
+    "difficulty": 2,
+    "tags": [
+      "art",
+      "style"
+    ]
+  },
+  {
+    "id": "w038",
+    "es": {
+      "word": "Diáfano",
+      "def": "Muy fino y translúcido, deja pasar la luz."
+    },
+    "en": {
+      "word": "Diaphanous",
+      "def": "Very thin and translucent; letting light pass through."
+    },
+    "difficulty": 3,
+    "tags": [
+      "art",
+      "visual"
+    ]
+  },
+  {
+    "id": "w039",
+    "es": {
+      "word": "Obnubilar",
+      "def": "Nublar la mente; dificultar el juicio o la claridad mental."
+    },
+    "en": {
+      "word": "Obnubilate",
+      "def": "To cloud the mind; to impair judgment or clarity."
+    },
+    "difficulty": 3,
+    "tags": [
+      "mind",
+      "mood"
+    ]
+  },
+  {
+    "id": "w040",
+    "es": {
+      "word": "Elucubrar",
+      "def": "Pensar o elaborar con esfuerzo una idea compleja o rebuscada."
+    },
+    "en": {
+      "word": "Elucubrate",
+      "def": "To work out an idea with laborious or overcomplicated thought."
+    },
+    "difficulty": 3,
+    "tags": [
+      "thinking",
+      "language"
+    ]
+  },
+  {
+    "id": "w041",
+    "es": {
+      "word": "Sibilino",
+      "def": "Oscuro o enigmático, difícil de interpretar."
+    },
+    "en": {
+      "word": "Sibylline",
+      "def": "Mysterious or cryptic; hard to interpret."
+    },
+    "difficulty": 3,
+    "tags": [
+      "language",
+      "people"
+    ]
+  },
+  {
+    "id": "w042",
+    "es": {
+      "word": "Sesgo",
+      "def": "Inclinación que distorsiona el juicio, a menudo de forma inconsciente."
+    },
+    "en": {
+      "word": "Bias",
+      "def": "A leaning that distorts judgment, often unconsciously."
+    },
+    "difficulty": 1,
+    "tags": [
+      "mind",
+      "psychology"
+    ]
+  },
+  {
+    "id": "w043",
+    "es": {
+      "word": "Quimera",
+      "def": "Ilusión o proyecto imposible; también, mezcla irreal de partes."
+    },
+    "en": {
+      "word": "Chimera",
+      "def": "An impossible fantasy or a strange mixture of parts."
+    },
+    "difficulty": 2,
+    "tags": [
+      "myth",
+      "language"
+    ]
+  },
+  {
+    "id": "w044",
+    "es": {
+      "word": "Ucronía",
+      "def": "Relato de historia alternativa: qué pasaría si algo hubiera sido distinto."
+    },
+    "en": {
+      "word": "Uchronia",
+      "def": "An alternate-history scenario: what if events had gone differently."
+    },
+    "difficulty": 3,
+    "tags": [
+      "history",
+      "story"
+    ]
+  },
+  {
+    "id": "w045",
+    "es": {
+      "word": "Palimpsesto",
+      "def": "Texto reescrito sobre restos de uno anterior; capa sobre capa de escritura."
+    },
+    "en": {
+      "word": "Palimpsest",
+      "def": "A text written over earlier erased writing; layers of writing."
+    },
+    "difficulty": 4,
+    "tags": [
+      "history",
+      "language"
+    ]
+  },
+  {
+    "id": "w046",
+    "es": {
+      "word": "Epifanía",
+      "def": "Comprensión repentina y reveladora."
+    },
+    "en": {
+      "word": "Epiphany",
+      "def": "A sudden, illuminating realization."
+    },
+    "difficulty": 2,
+    "tags": [
+      "mind",
+      "story"
+    ]
+  },
+  {
+    "id": "w047",
+    "es": {
+      "word": "Némesis",
+      "def": "Rival o fuerza que castiga el exceso; enemigo inevitable."
+    },
+    "en": {
+      "word": "Nemesis",
+      "def": "A rival or inescapable force of retribution."
+    },
+    "difficulty": 2,
+    "tags": [
+      "myth",
+      "story"
+    ]
+  },
+  {
+    "id": "w048",
+    "es": {
+      "word": "Aporía",
+      "def": "Duda o impase lógico que deja sin salida clara."
+    },
+    "en": {
+      "word": "Aporia",
+      "def": "A logical impasse that leaves no clear way forward."
+    },
+    "difficulty": 4,
+    "tags": [
+      "logic",
+      "philosophy"
+    ]
+  },
+  {
+    "id": "w049",
+    "es": {
+      "word": "Sinecdoque",
+      "def": "Figura: nombrar la parte por el todo o el todo por la parte."
+    },
+    "en": {
+      "word": "Synecdoche",
+      "def": "A figure of speech using a part for the whole or the whole for a part."
+    },
+    "difficulty": 4,
+    "tags": [
+      "language",
+      "classic"
+    ]
+  },
+  {
+    "id": "w050",
+    "es": {
+      "word": "Metonimia",
+      "def": "Figura: reemplazar un término por otro relacionado (autor por obra, etc.)."
+    },
+    "en": {
+      "word": "Metonymy",
+      "def": "A figure of speech replacing a term with a related one (author for work, etc.)."
+    },
+    "difficulty": 3,
+    "tags": [
+      "language",
+      "classic"
+    ]
+  },
+  {
+    "id": "w051",
+    "es": {
+      "word": "Hipálage",
+      "def": "Atribuir a una palabra lo que corresponde a otra (\"la noche insomne\")."
+    },
+    "en": {
+      "word": "Hypallage",
+      "def": "Shifting an attribute to a word it doesn't logically belong to."
+    },
+    "difficulty": 5,
+    "tags": [
+      "language",
+      "classic"
+    ]
+  },
+  {
+    "id": "w052",
+    "es": {
+      "word": "Nostalgia",
+      "def": "Tristeza suave por el pasado y lo perdido."
+    },
+    "en": {
+      "word": "Nostalgia",
+      "def": "A bittersweet longing for the past."
+    },
+    "difficulty": 1,
+    "tags": [
+      "mood",
+      "classic"
+    ]
+  },
+  {
+    "id": "w053",
+    "es": {
+      "word": "Melancolía",
+      "def": "Tristeza persistente, reflexiva, a menudo sin causa definida."
+    },
+    "en": {
+      "word": "Melancholy",
+      "def": "A reflective, lingering sadness, often without a clear cause."
+    },
+    "difficulty": 1,
+    "tags": [
+      "mood",
+      "classic"
+    ]
+  },
+  {
+    "id": "w054",
+    "es": {
+      "word": "Serendipia",
+      "def": "Hallazgo valioso e inesperado mientras se buscaba otra cosa."
+    },
+    "en": {
+      "word": "Serendipity",
+      "def": "A valuable, unexpected discovery while seeking something else."
+    },
+    "difficulty": 2,
+    "tags": [
+      "life",
+      "luck"
+    ]
+  },
+  {
+    "id": "w055",
+    "es": {
+      "word": "Procrastinar",
+      "def": "Posponer una tarea importante, aun sabiendo que trae consecuencias."
+    },
+    "en": {
+      "word": "Procrastinate",
+      "def": "To delay an important task despite knowing it has consequences."
+    },
+    "difficulty": 1,
+    "tags": [
+      "life",
+      "mind"
+    ]
+  },
+  {
+    "id": "w056",
+    "es": {
+      "word": "Solipsismo",
+      "def": "Idea de que solo la propia mente es segura; lo externo es dudoso."
+    },
+    "en": {
+      "word": "Solipsism",
+      "def": "The view that only one's own mind is certain and the external is doubtful."
+    },
+    "difficulty": 4,
+    "tags": [
+      "philosophy",
+      "mind"
+    ]
+  },
+  {
+    "id": "w057",
+    "es": {
+      "word": "Lacónico",
+      "def": "Que habla o escribe con pocas palabras, sin rodeos."
+    },
+    "en": {
+      "word": "Laconic",
+      "def": "Using very few words; terse and direct."
+    },
+    "difficulty": 2,
+    "tags": [
+      "people",
+      "language"
+    ]
+  },
+  {
+    "id": "w058",
+    "es": {
+      "word": "Prolijo",
+      "def": "Cuidadoso y ordenado, atento a los detalles."
+    },
+    "en": {
+      "word": "Meticulous",
+      "def": "Careful and orderly; attentive to detail."
+    },
+    "difficulty": 2,
+    "tags": [
+      "people",
+      "work"
+    ]
+  },
+  {
+    "id": "w059",
+    "es": {
+      "word": "Inefable",
+      "def": "Tan extraordinario que resulta difícil de expresar con palabras."
+    },
+    "en": {
+      "word": "Ineffable",
+      "def": "So extraordinary it is hard to describe in words."
+    },
+    "difficulty": 3,
+    "tags": [
+      "poetic",
+      "language"
+    ]
+  },
+  {
+    "id": "w060",
+    "es": {
+      "word": "Inexorable",
+      "def": "Que no se detiene ni se deja persuadir; implacable."
+    },
+    "en": {
+      "word": "Inexorable",
+      "def": "Impossible to stop or persuade; relentless."
+    },
+    "difficulty": 3,
+    "tags": [
+      "people",
+      "life"
+    ]
+  },
+  {
+    "id": "w061",
+    "es": {
+      "word": "Obsequioso",
+      "def": "Excesivamente servil o adulador."
+    },
+    "en": {
+      "word": "Obsequious",
+      "def": "Excessively eager to please; fawning."
+    },
+    "difficulty": 3,
+    "tags": [
+      "people",
+      "relationships"
+    ]
+  },
+  {
+    "id": "w062",
+    "es": {
+      "word": "Ubiquo",
+      "def": "Que está en todas partes a la vez, o aparece con mucha frecuencia."
+    },
+    "en": {
+      "word": "Ubiquitous",
+      "def": "Present everywhere at once, or very common."
+    },
+    "difficulty": 2,
+    "tags": [
+      "science",
+      "life"
+    ]
+  },
+  {
+    "id": "w063",
+    "es": {
+      "word": "Quiescente",
+      "def": "En reposo; temporalmente inactivo pero no muerto."
+    },
+    "en": {
+      "word": "Quiescent",
+      "def": "At rest; temporarily inactive but not dead."
+    },
+    "difficulty": 3,
+    "tags": [
+      "science",
+      "nature"
+    ]
+  },
+  {
+    "id": "w064",
+    "es": {
+      "word": "Efímero",
+      "def": "De corta duración; pasajero."
+    },
+    "en": {
+      "word": "Ephemeral",
+      "def": "Short-lived; lasting a very brief time."
+    },
+    "difficulty": 2,
+    "tags": [
+      "poetic",
+      "life"
+    ]
+  },
+  {
+    "id": "w065",
+    "es": {
+      "word": "Liminal",
+      "def": "Que está en un umbral: entre dos estados o etapas."
+    },
+    "en": {
+      "word": "Liminal",
+      "def": "At a threshold: between two states or stages."
+    },
+    "difficulty": 4,
+    "tags": [
+      "mind",
+      "story"
+    ]
+  },
+  {
+    "id": "w066",
+    "es": {
+      "word": "Iridescente",
+      "def": "Que cambia de color según la luz o el ángulo."
+    },
+    "en": {
+      "word": "Iridescent",
+      "def": "Showing shifting colors depending on light or angle."
+    },
+    "difficulty": 2,
+    "tags": [
+      "visual",
+      "nature"
+    ]
+  },
+  {
+    "id": "w067",
+    "es": {
+      "word": "Inerte",
+      "def": "Sin movimiento ni reacción; carente de energía."
+    },
+    "en": {
+      "word": "Inert",
+      "def": "Without movement or reaction; lacking energy."
+    },
+    "difficulty": 1,
+    "tags": [
+      "science",
+      "life"
+    ]
+  },
+  {
+    "id": "w068",
+    "es": {
+      "word": "Munificente",
+      "def": "Muy generoso, especialmente al dar recursos o dinero."
+    },
+    "en": {
+      "word": "Munificent",
+      "def": "Very generous, especially in giving resources or money."
+    },
+    "difficulty": 3,
+    "tags": [
+      "people",
+      "life"
+    ]
+  },
+  {
+    "id": "w069",
+    "es": {
+      "word": "Parsimonia",
+      "def": "Moderación extrema al gastar o usar recursos; frugalidad."
+    },
+    "en": {
+      "word": "Parsimony",
+      "def": "Extreme economy in spending or using resources; thrift."
+    },
+    "difficulty": 3,
+    "tags": [
+      "life",
+      "money"
+    ]
+  },
+  {
+    "id": "w070",
+    "es": {
+      "word": "Suntuoso",
+      "def": "Lujoso y abundante, de gran riqueza visual o material."
+    },
+    "en": {
+      "word": "Sumptuous",
+      "def": "Luxurious and lavish; richly abundant."
+    },
+    "difficulty": 2,
+    "tags": [
+      "style",
+      "life"
+    ]
+  },
+  {
+    "id": "w071",
+    "es": {
+      "word": "Nefasto",
+      "def": "Muy dañino o malvado; de mala influencia."
+    },
+    "en": {
+      "word": "Nefarious",
+      "def": "Wicked or extremely harmful; evil in intent."
+    },
+    "difficulty": 2,
+    "tags": [
+      "people",
+      "story"
+    ]
+  },
+  {
+    "id": "w072",
+    "es": {
+      "word": "Sagaz",
+      "def": "Perspicaz y con buen juicio; de mente aguda."
+    },
+    "en": {
+      "word": "Sagacious",
+      "def": "Keenly perceptive and of sound judgment."
+    },
+    "difficulty": 2,
+    "tags": [
+      "people",
+      "mind"
+    ]
+  },
+  {
+    "id": "w073",
+    "es": {
+      "word": "Taciturno",
+      "def": "Reservado y de pocas palabras, especialmente por temperamento."
+    },
+    "en": {
+      "word": "Taciturn",
+      "def": "Reserved and sparing in speech by temperament."
+    },
+    "difficulty": 2,
+    "tags": [
+      "people",
+      "mood"
+    ]
+  },
+  {
+    "id": "w074",
+    "es": {
+      "word": "Voraz",
+      "def": "Con apetito intenso; que consume con avidez."
+    },
+    "en": {
+      "word": "Voracious",
+      "def": "Having an intense appetite; consuming eagerly."
+    },
+    "difficulty": 2,
+    "tags": [
+      "people",
+      "life"
+    ]
+  },
+  {
+    "id": "w075",
+    "es": {
+      "word": "Cándido",
+      "def": "Sincero y directo, sin malicia."
+    },
+    "en": {
+      "word": "Candor",
+      "def": "Openly sincere; free from malice."
+    },
+    "difficulty": 2,
+    "tags": [
+      "people",
+      "relationships"
+    ]
+  },
+  {
+    "id": "w076",
+    "es": {
+      "word": "Nítido",
+      "def": "Claro, fácil de percibir o entender."
+    },
+    "en": {
+      "word": "Lucid",
+      "def": "Clear and easy to perceive or understand."
+    },
+    "difficulty": 1,
+    "tags": [
+      "mind",
+      "language"
+    ]
+  },
+  {
+    "id": "w077",
+    "es": {
+      "word": "Onírico",
+      "def": "Relacionado con los sueños o con una atmósfera de sueño."
+    },
+    "en": {
+      "word": "Oneiric",
+      "def": "Related to dreams or dreamlike atmosphere."
+    },
+    "difficulty": 3,
+    "tags": [
+      "art",
+      "story"
+    ]
+  },
+  {
+    "id": "w078",
+    "es": {
+      "word": "Susurro",
+      "def": "Voz muy baja; sonido suave y casi secreto."
+    },
+    "en": {
+      "word": "Whisper",
+      "def": "A very soft voice; a quiet, secret-like sound."
+    },
+    "difficulty": 1,
+    "tags": [
+      "senses",
+      "story"
+    ]
+  },
+  {
+    "id": "w079",
+    "es": {
+      "word": "Albedo",
+      "def": "Proporción de luz que una superficie refleja."
+    },
+    "en": {
+      "word": "Albedo",
+      "def": "The proportion of light a surface reflects."
+    },
+    "difficulty": 4,
+    "tags": [
+      "science",
+      "nature"
+    ]
+  },
+  {
+    "id": "w080",
+    "es": {
+      "word": "Isobara",
+      "def": "Línea que une puntos de igual presión atmosférica."
+    },
+    "en": {
+      "word": "Isobar",
+      "def": "A line connecting points of equal atmospheric pressure."
+    },
+    "difficulty": 4,
+    "tags": [
+      "science",
+      "weather"
+    ]
+  },
+  {
+    "id": "w081",
+    "es": {
+      "word": "Zeugma",
+      "def": "Figura: un verbo rige dos complementos de manera distinta."
+    },
+    "en": {
+      "word": "Zeugma",
+      "def": "A figure of speech where one verb governs two objects differently."
+    },
+    "difficulty": 5,
+    "tags": [
+      "language",
+      "classic"
+    ]
+  },
+  {
+    "id": "w082",
+    "es": {
+      "word": "Oxímoron",
+      "def": "Unión de términos opuestos para crear un sentido nuevo."
+    },
+    "en": {
+      "word": "Oxymoron",
+      "def": "A combination of opposite terms creating a new meaning."
+    },
+    "difficulty": 3,
+    "tags": [
+      "language",
+      "classic"
+    ]
+  },
+  {
+    "id": "w083",
+    "es": {
+      "word": "Paradoja",
+      "def": "Enunciado que parece contradictorio pero encierra verdad."
+    },
+    "en": {
+      "word": "Paradox",
+      "def": "A statement that seems contradictory yet may be true."
+    },
+    "difficulty": 2,
+    "tags": [
+      "logic",
+      "language"
+    ]
+  },
+  {
+    "id": "w084",
+    "es": {
+      "word": "Catarsis",
+      "def": "Liberación emocional intensa que produce alivio."
+    },
+    "en": {
+      "word": "Catharsis",
+      "def": "An intense emotional release that brings relief."
+    },
+    "difficulty": 2,
+    "tags": [
+      "mood",
+      "story"
+    ]
+  },
+  {
+    "id": "w085",
+    "es": {
+      "word": "Resiliencia",
+      "def": "Capacidad de recuperarse después de una dificultad."
+    },
+    "en": {
+      "word": "Resilience",
+      "def": "The ability to recover after adversity."
+    },
+    "difficulty": 1,
+    "tags": [
+      "life",
+      "mind"
+    ]
+  },
+  {
+    "id": "w086",
+    "es": {
+      "word": "Indolente",
+      "def": "Inclinado a la pereza; sin voluntad de esforzarse."
+    },
+    "en": {
+      "word": "Indolent",
+      "def": "Inclined to laziness; avoiding effort."
+    },
+    "difficulty": 2,
+    "tags": [
+      "people",
+      "mood"
+    ]
+  },
+  {
+    "id": "w087",
+    "es": {
+      "word": "Inmanente",
+      "def": "Que existe dentro de algo y no como fuerza externa."
+    },
+    "en": {
+      "word": "Immanent",
+      "def": "Existing within something rather than as an external force."
+    },
+    "difficulty": 4,
+    "tags": [
+      "philosophy",
+      "thinking"
+    ]
+  },
+  {
+    "id": "w088",
+    "es": {
+      "word": "Trémulo",
+      "def": "Que tiembla ligeramente; vacilante."
+    },
+    "en": {
+      "word": "Tremulous",
+      "def": "Slightly trembling; wavering."
+    },
+    "difficulty": 2,
+    "tags": [
+      "senses",
+      "mood"
+    ]
+  },
+  {
+    "id": "w089",
+    "es": {
+      "word": "Acrimonia",
+      "def": "Aspereza o amargura en el trato o en las palabras."
+    },
+    "en": {
+      "word": "Acrimony",
+      "def": "Bitterness or harshness in speech or manner."
+    },
+    "difficulty": 3,
+    "tags": [
+      "people",
+      "language"
+    ]
+  },
+  {
+    "id": "w090",
+    "es": {
+      "word": "Anomia",
+      "def": "Sensación de falta de normas o desconexión social."
+    },
+    "en": {
+      "word": "Anomie",
+      "def": "A sense of normlessness or social disconnection."
+    },
+    "difficulty": 4,
+    "tags": [
+      "society",
+      "mind"
+    ]
+  },
+  {
+    "id": "w091",
+    "es": {
+      "word": "Anodino",
+      "def": "Insípido o poco interesante; también, que alivia el dolor."
+    },
+    "en": {
+      "word": "Anodyne",
+      "def": "Dull and uninteresting; also, pain-relieving."
+    },
+    "difficulty": 3,
+    "tags": [
+      "language",
+      "life"
+    ]
+  },
+  {
+    "id": "w092",
+    "es": {
+      "word": "Arquetipo",
+      "def": "Modelo original que sirve de patrón para otros."
+    },
+    "en": {
+      "word": "Archetype",
+      "def": "An original model that serves as a pattern for others."
+    },
+    "difficulty": 2,
+    "tags": [
+      "story",
+      "psychology"
+    ]
+  },
+  {
+    "id": "w093",
+    "es": {
+      "word": "Auscultar",
+      "def": "Escuchar sonidos internos del cuerpo, especialmente con estetoscopio."
+    },
+    "en": {
+      "word": "Auscultate",
+      "def": "To listen to internal body sounds, especially with a stethoscope."
+    },
+    "difficulty": 4,
+    "tags": [
+      "science",
+      "health"
+    ]
+  },
+  {
+    "id": "w094",
+    "es": {
+      "word": "Bizarro",
+      "def": "Extraño o poco común, a veces llamativamente."
+    },
+    "en": {
+      "word": "Bizarre",
+      "def": "Strange or unusual, often strikingly so."
+    },
+    "difficulty": 1,
+    "tags": [
+      "life",
+      "story"
+    ]
+  },
+  {
+    "id": "w095",
+    "es": {
+      "word": "Bochorno",
+      "def": "Calor sofocante; también, vergüenza intensa."
+    },
+    "en": {
+      "word": "Swelter",
+      "def": "Oppressive heat; also, intense embarrassment."
+    },
+    "difficulty": 2,
+    "tags": [
+      "senses",
+      "mood"
+    ]
+  },
+  {
+    "id": "w096",
+    "es": {
+      "word": "Cenit",
+      "def": "Punto más alto; momento de máximo esplendor."
+    },
+    "en": {
+      "word": "Zenith",
+      "def": "The highest point; a time of greatest achievement."
+    },
+    "difficulty": 2,
+    "tags": [
+      "life",
+      "science"
+    ]
+  },
+  {
+    "id": "w097",
+    "es": {
+      "word": "Cicatriz",
+      "def": "Marca permanente que deja una herida al sanar."
+    },
+    "en": {
+      "word": "Scar",
+      "def": "A lasting mark left after a wound heals."
+    },
+    "difficulty": 1,
+    "tags": [
+      "body",
+      "life"
+    ]
+  },
+  {
+    "id": "w098",
+    "es": {
+      "word": "Concomitante",
+      "def": "Que ocurre al mismo tiempo y está asociado a otra cosa."
+    },
+    "en": {
+      "word": "Concomitant",
+      "def": "Occurring alongside and associated with something else."
+    },
+    "difficulty": 4,
+    "tags": [
+      "thinking",
+      "language"
+    ]
+  },
+  {
+    "id": "w099",
+    "es": {
+      "word": "Conjetura",
+      "def": "Suposición basada en indicios, sin certeza."
+    },
+    "en": {
+      "word": "Conjecture",
+      "def": "A guess based on clues, without certainty."
+    },
+    "difficulty": 2,
+    "tags": [
+      "thinking",
+      "logic"
+    ]
+  },
+  {
+    "id": "w100",
+    "es": {
+      "word": "Corolario",
+      "def": "Conclusión que se desprende naturalmente de algo anterior."
+    },
+    "en": {
+      "word": "Corollary",
+      "def": "A conclusion that follows naturally from previous statements."
+    },
+    "difficulty": 4,
+    "tags": [
+      "logic",
+      "thinking"
+    ]
+  },
+  {
+    "id": "w101",
+    "es": {
+      "word": "Crisálida",
+      "def": "Etapa de transformación de ciertos insectos antes de ser adultos."
+    },
+    "en": {
+      "word": "Chrysalis",
+      "def": "A transforming stage of some insects before adulthood."
+    },
+    "difficulty": 2,
+    "tags": [
+      "nature",
+      "science"
+    ]
+  },
+  {
+    "id": "w102",
+    "es": {
+      "word": "Cúmulo",
+      "def": "Conjunto o acumulación de cosas similares."
+    },
+    "en": {
+      "word": "Cluster",
+      "def": "A grouped accumulation of similar things."
+    },
+    "difficulty": 1,
+    "tags": [
+      "science",
+      "life"
+    ]
+  },
+  {
+    "id": "w103",
+    "es": {
+      "word": "Decoro",
+      "def": "Conducta apropiada según normas sociales o de situación."
+    },
+    "en": {
+      "word": "Decorum",
+      "def": "Behavior appropriate to social norms or a given situation."
+    },
+    "difficulty": 2,
+    "tags": [
+      "society",
+      "people"
+    ]
+  },
+  {
+    "id": "w104",
+    "es": {
+      "word": "Deliquescente",
+      "def": "Que se disuelve al absorber humedad del aire."
+    },
+    "en": {
+      "word": "Deliquescent",
+      "def": "Dissolving by absorbing moisture from the air."
+    },
+    "difficulty": 5,
+    "tags": [
+      "science",
+      "nature"
+    ]
+  },
+  {
+    "id": "w105",
+    "es": {
+      "word": "Díada",
+      "def": "Pareja o conjunto de dos elementos relacionados."
+    },
+    "en": {
+      "word": "Dyad",
+      "def": "A pair of related elements."
+    },
+    "difficulty": 4,
+    "tags": [
+      "science",
+      "thinking"
+    ]
+  },
+  {
+    "id": "w106",
+    "es": {
+      "word": "Disonancia",
+      "def": "Falta de armonía; choque entre ideas o sonidos."
+    },
+    "en": {
+      "word": "Dissonance",
+      "def": "Lack of harmony; a clash between ideas or sounds."
+    },
+    "difficulty": 2,
+    "tags": [
+      "music",
+      "mind"
+    ]
+  },
+  {
+    "id": "w107",
+    "es": {
+      "word": "Ductilidad",
+      "def": "Capacidad de estirarse sin romperse; flexibilidad material."
+    },
+    "en": {
+      "word": "Ductility",
+      "def": "The ability to stretch without breaking; material flexibility."
+    },
+    "difficulty": 4,
+    "tags": [
+      "science",
+      "materials"
+    ]
+  },
+  {
+    "id": "w108",
+    "es": {
+      "word": "Efluvio",
+      "def": "Emisión sutil de olor o vapor."
+    },
+    "en": {
+      "word": "Effluvium",
+      "def": "A subtle emission of odor or vapor."
+    },
+    "difficulty": 4,
+    "tags": [
+      "senses",
+      "nature"
+    ]
+  },
+  {
+    "id": "w109",
+    "es": {
+      "word": "Egregio",
+      "def": "Muy destacado o notable; a veces, escandalosamente malo."
+    },
+    "en": {
+      "word": "Egregious",
+      "def": "Remarkably outstanding; sometimes shockingly bad."
+    },
+    "difficulty": 3,
+    "tags": [
+      "people",
+      "language"
+    ]
+  },
+  {
+    "id": "w110",
+    "es": {
+      "word": "Elogio",
+      "def": "Discurso de alabanza, especialmente en un funeral."
+    },
+    "en": {
+      "word": "Eulogy",
+      "def": "A speech of praise, especially at a funeral."
+    },
+    "difficulty": 2,
+    "tags": [
+      "people",
+      "story"
+    ]
+  },
+  {
+    "id": "w111",
+    "es": {
+      "word": "Enigma",
+      "def": "Algo difícil de entender o resolver."
+    },
+    "en": {
+      "word": "Enigma",
+      "def": "Something puzzling and hard to solve."
+    },
+    "difficulty": 1,
+    "tags": [
+      "mind",
+      "story"
+    ]
+  },
+  {
+    "id": "w112",
+    "es": {
+      "word": "Enjambre",
+      "def": "Conjunto denso de insectos o gente en movimiento."
+    },
+    "en": {
+      "word": "Swarm",
+      "def": "A dense moving group of insects or people."
+    },
+    "difficulty": 1,
+    "tags": [
+      "nature",
+      "life"
+    ]
+  },
+  {
+    "id": "w113",
+    "es": {
+      "word": "Entropía",
+      "def": "Medida de desorden o dispersión de energía en un sistema."
+    },
+    "en": {
+      "word": "Entropy",
+      "def": "A measure of disorder or energy dispersal in a system."
+    },
+    "difficulty": 4,
+    "tags": [
+      "science",
+      "physics"
+    ]
+  },
+  {
+    "id": "w114",
+    "es": {
+      "word": "Escorzo",
+      "def": "Representación en perspectiva que acorta las formas hacia el fondo."
+    },
+    "en": {
+      "word": "Foreshortening",
+      "def": "A perspective effect that visually shortens forms toward depth."
+    },
+    "difficulty": 4,
+    "tags": [
+      "art",
+      "visual"
+    ]
+  },
+  {
+    "id": "w115",
+    "es": {
+      "word": "Esquirla",
+      "def": "Fragmento pequeño y agudo que se desprende de algo."
+    },
+    "en": {
+      "word": "Splinter",
+      "def": "A small sharp fragment that breaks off."
+    },
+    "difficulty": 2,
+    "tags": [
+      "life",
+      "objects"
+    ]
+  },
+  {
+    "id": "w116",
+    "es": {
+      "word": "Estertor",
+      "def": "Respiración dificultosa y ruidosa, cercana al final."
+    },
+    "en": {
+      "word": "Rattle",
+      "def": "A harsh, rattling breath near the end of life."
+    },
+    "difficulty": 4,
+    "tags": [
+      "health",
+      "life"
+    ]
+  },
+  {
+    "id": "w117",
+    "es": {
+      "word": "Exiguo",
+      "def": "Muy escaso o insuficiente."
+    },
+    "en": {
+      "word": "Meager",
+      "def": "Very small, scarce, or insufficient."
+    },
+    "difficulty": 2,
+    "tags": [
+      "life",
+      "language"
+    ]
+  },
+  {
+    "id": "w118",
+    "es": {
+      "word": "Fulgor",
+      "def": "Brillo intenso y momentáneo."
+    },
+    "en": {
+      "word": "Fulgor",
+      "def": "A sudden, intense brightness."
+    },
+    "difficulty": 2,
+    "tags": [
+      "visual",
+      "poetic"
+    ]
+  },
+  {
+    "id": "w119",
+    "es": {
+      "word": "Fútil",
+      "def": "De poca importancia o sin resultado útil."
+    },
+    "en": {
+      "word": "Futile",
+      "def": "Of little importance or producing no useful result."
+    },
+    "difficulty": 2,
+    "tags": [
+      "life",
+      "thinking"
+    ]
+  },
+  {
+    "id": "w120",
+    "es": {
+      "word": "Garrulo",
+      "def": "Que habla en exceso, con facilidad y sin parar."
+    },
+    "en": {
+      "word": "Garrulous",
+      "def": "Excessively talkative; chatty."
+    },
+    "difficulty": 3,
+    "tags": [
+      "people",
+      "language"
+    ]
+  },
+  {
+    "id": "w121",
+    "es": {
+      "word": "Hermético",
+      "def": "Cerrado o difícil de comprender; también, sellado al aire."
+    },
+    "en": {
+      "word": "Hermetic",
+      "def": "Sealed airtight; also, hard to understand."
+    },
+    "difficulty": 3,
+    "tags": [
+      "science",
+      "language"
+    ]
+  },
+  {
+    "id": "w122",
+    "es": {
+      "word": "Idiosincrasia",
+      "def": "Rasgo particular y distintivo de una persona o grupo."
+    },
+    "en": {
+      "word": "Idiosyncrasy",
+      "def": "A distinctive personal or group characteristic."
+    },
+    "difficulty": 3,
+    "tags": [
+      "people",
+      "society"
+    ]
+  },
+  {
+    "id": "w123",
+    "es": {
+      "word": "Impronta",
+      "def": "Marca o huella que deja algo; influencia duradera."
+    },
+    "en": {
+      "word": "Imprint",
+      "def": "A mark left by something; a lasting influence."
+    },
+    "difficulty": 2,
+    "tags": [
+      "life",
+      "language"
+    ]
+  },
+  {
+    "id": "w124",
+    "es": {
+      "word": "Inconmensurable",
+      "def": "Tan grande que no puede medirse con exactitud."
+    },
+    "en": {
+      "word": "Incommensurable",
+      "def": "So great it cannot be measured precisely."
+    },
+    "difficulty": 4,
+    "tags": [
+      "thinking",
+      "poetic"
+    ]
+  },
+  {
+    "id": "w125",
+    "es": {
+      "word": "Interregno",
+      "def": "Periodo entre dos gobiernos o mandatos."
+    },
+    "en": {
+      "word": "Interregnum",
+      "def": "A period between two reigns or administrations."
+    },
+    "difficulty": 4,
+    "tags": [
+      "history",
+      "society"
+    ]
+  },
+  {
+    "id": "w126",
+    "es": {
+      "word": "Ipsis",
+      "def": "La esencia misma de algo; su identidad más pura."
+    },
+    "en": {
+      "word": "Ipsis",
+      "def": "The very essence of something; its pure identity."
+    },
+    "difficulty": 5,
+    "tags": [
+      "philosophy",
+      "language"
+    ]
+  },
+  {
+    "id": "w127",
+    "es": {
+      "word": "Latencia",
+      "def": "Demora o tiempo de respuesta; también, estado oculto."
+    },
+    "en": {
+      "word": "Latency",
+      "def": "Delay in response time; also, a hidden state."
+    },
+    "difficulty": 3,
+    "tags": [
+      "tech",
+      "science"
+    ]
+  },
+  {
+    "id": "w128",
+    "es": {
+      "word": "Léxico",
+      "def": "Conjunto de palabras de una lengua o tema."
+    },
+    "en": {
+      "word": "Lexicon",
+      "def": "The vocabulary of a language or domain."
+    },
+    "difficulty": 2,
+    "tags": [
+      "language",
+      "learning"
+    ]
+  },
+  {
+    "id": "w129",
+    "es": {
+      "word": "Luctuoso",
+      "def": "Triste y relacionado con duelo o muerte."
+    },
+    "en": {
+      "word": "Lugubrious",
+      "def": "Mournful and associated with grief or death."
+    },
+    "difficulty": 3,
+    "tags": [
+      "mood",
+      "story"
+    ]
+  },
+  {
+    "id": "w130",
+    "es": {
+      "word": "Magnánimo",
+      "def": "Generoso y noble, especialmente con quien podría ser rival."
+    },
+    "en": {
+      "word": "Magnanimous",
+      "def": "Generous and noble, especially toward a rival."
+    },
+    "difficulty": 3,
+    "tags": [
+      "people",
+      "relationships"
+    ]
+  },
+  {
+    "id": "w131",
+    "es": {
+      "word": "Nadir",
+      "def": "Punto más bajo; momento de mínima intensidad."
+    },
+    "en": {
+      "word": "Nadir",
+      "def": "The lowest point; a time of least strength."
+    },
+    "difficulty": 2,
+    "tags": [
+      "life",
+      "science"
+    ]
+  },
+  {
+    "id": "w132",
+    "es": {
+      "word": "Nimbo",
+      "def": "Aureola; también, nube luminosa o halo."
+    },
+    "en": {
+      "word": "Nimbus",
+      "def": "A halo; also, a luminous cloud-like aura."
+    },
+    "difficulty": 3,
+    "tags": [
+      "visual",
+      "poetic"
+    ]
   }
 ]
