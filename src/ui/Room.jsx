@@ -1,10 +1,39 @@
 import React, { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode.react";
-import { PHASE, subscribePlayers, subscribeRoom, subscribeRound, subscribeSubmissions, subscribeVotes,
-         startGame, submitDefinition, openVoting, castVote, revealAndScore, nextOrFinish } from "../lib/game";
+import {
+  PHASE,
+  subscribePlayers,
+  subscribeRoom,
+  subscribeRound,
+  subscribeSubmissions,
+  subscribeVotes,
+  startGame,
+  submitDefinition,
+  openVoting,
+  castVote,
+  revealAndScore,
+  nextOrFinish,
+  chooseWordForRound,
+} from "../lib/game";
 import { shuffle } from "../lib/util";
 
 function byName(a,b){ return (a.name||"").localeCompare(b.name||""); }
+
+const AVATARS = [
+  "😀","😎","🤓","🥸","😺","👻","🦊","🐼","🐯","🐸","🐵","🐙",
+  "🦄","🐝","🐲","🐧","🦁","🐰","🐨","🦉","🐢","🦋","🐬","🐺",
+];
+
+function hashUid(uid){
+  const s = uid || "";
+  let h = 0;
+  for (let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+function avatarForUid(uid){
+  return AVATARS[hashUid(uid) % AVATARS.length];
+}
 
 export default function Room({ uid, roomId, onExit }){
   const [room, setRoom] = useState(null);
@@ -74,6 +103,13 @@ export default function Room({ uid, roomId, onExit }){
     finally { setBusy(false); }
   }
 
+  async function doChooseWord(wordId){
+    setErr(""); setBusy(true);
+    try { await chooseWordForRound(roomId, room.currentRoundId, uid, wordId); }
+    catch(e){ setErr(e.message || String(e)); }
+    finally { setBusy(false); }
+  }
+
   async function doReveal(){
     setErr(""); setBusy(true);
     try { await revealAndScore(roomId, room.currentRoundId, uid); }
@@ -107,10 +143,48 @@ export default function Room({ uid, roomId, onExit }){
 
   const sortedPlayers = useMemo(() => [...players].sort(byName), [players]);
 
+  const phaseLabel = useMemo(() => {
+    switch (room?.status) {
+      case PHASE.LOBBY: return "Lobby";
+      case PHASE.WORD_SELECT: return "Choose word";
+      case PHASE.WRITING: return "Write";
+      case PHASE.VOTING: return "Vote";
+      case PHASE.REVEAL: return "Results";
+      case PHASE.FINISHED: return "Finished";
+      default: return String(room?.status || "");
+    }
+  }, [room?.status]);
+
+  const bgKey = useMemo(() => {
+    const base = `${roomId}:${room?.currentRoundId || ""}:${room?.status || ""}`;
+    let h = 0;
+    for (let i = 0; i < base.length; i++) h = (h * 31 + base.charCodeAt(i)) >>> 0;
+    return h % 6; // pick a background variant
+  }, [roomId, room?.currentRoundId, room?.status]);
+
+  const bestBluff = useMemo(() => {
+    if (!round || room?.status !== PHASE.REVEAL) return null;
+    // Count votes per choiceId
+    const counts = new Map();
+    for (const v of votes) counts.set(v.choiceId, (counts.get(v.choiceId) || 0) + 1);
+    // Find the most-voted fake
+    let best = null;
+    for (const o of options) {
+      if (o.choiceId === "REAL") continue;
+      const c = counts.get(o.choiceId) || 0;
+      if (!best || c > best.votes) {
+        best = { choiceId: o.choiceId, text: o.text, votes: c, authorUid: o.authorUid };
+      }
+    }
+    if (!best) return null;
+    const author = players.find(p => p.uid === best.authorUid)?.name || "Someone";
+    return { ...best, author };
+  }, [room?.status, round, votes, options, players]);
+
   if (!room) {
     return (
       <div className="container">
-        <div className="card">
+      <div className="shell">
           <h1>Loading room…</h1>
         </div>
       </div>
@@ -122,202 +196,248 @@ export default function Room({ uid, roomId, onExit }){
 
   return (
     <div className="container">
-      <div className="topbar">
-        <div>
-          <h1>Room <span className="pill">{code}</span></h1>
-          <div className="muted">Target: {target} • Mode: {room.langMode || "both"} • Phase: {currentPhase}</div>
-        </div>
-        <div className="row">
+      <div className={`screen bgv${bgKey}`}>
+        <div className="topRow" style={{ marginBottom: 12 }}>
+          <div>
+            <div style={{ color: "white", fontWeight: 900, fontSize: 16 }}>
+              Room <span className="pill" style={{ marginLeft: 8 }}>{code}</span>
+            </div>
+            <div style={{ marginTop: 6 }}>
+              <span className="phaseBadge">{phaseLabel}</span>
+              <span className="pill ok" style={{ marginLeft: 8 }}>Target {target}</span>
+            </div>
+          </div>
           <button className="secondary" onClick={onExit}>Exit</button>
         </div>
-      </div>
 
-      <div className="grid2">
-        <div className="card">
-          <h2>Players</h2>
-          <ul className="list">
-            {sortedPlayers.map(p => (
-              <li key={p.uid}>
-                <strong>{p.name || "Player"}</strong> — {p.score ?? 0}
-                {p.uid === room.hostUid ? " (host)" : ""}
-                {p.uid === round?.readerUid ? " (reader)" : ""}
-                {p.uid === uid ? " (you)" : ""}
-              </li>
-            ))}
-          </ul>
-
-          {room.status === PHASE.LOBBY && (
-            <div style={{ marginTop: 12 }}>
-              <div className="muted" style={{ marginBottom: 10 }}>
-                Share this code (or QR) so others join. For MVP, everyone must join before starting.
-              </div>
-              <div className="row">
-                <div className="col">
-                  <div className="card" style={{ background:"#f9fafb" }}>
-                    <div className="muted">Join URL</div>
-                    <div style={{ wordBreak:"break-all", marginTop:6 }}>{joinUrl}</div>
+        {/* Avatar strip */}
+        <div className="panel" style={{ marginBottom: 12 }}>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {sortedPlayers.map(p => {
+              const isPHost = p.uid === room.hostUid;
+              const isPReader = p.uid === round?.readerUid;
+              const isMe = p.uid === uid;
+              return (
+                <div key={p.uid} className="avatarChip">
+                  <div className="avatarCircle" aria-hidden>{avatarForUid(p.uid)}</div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 900, lineHeight: 1.1 }}>
+                      {p.name || "Player"}{isMe ? " (you)" : ""}
+                    </div>
+                    <div className="muted" style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                      {isPHost && <span className="badge">host</span>}
+                      {isPReader && <span className="badge">reader</span>}
+                      <span className="badge">{p.score ?? 0} pts</span>
+                    </div>
                   </div>
                 </div>
-                <div className="col" style={{ display:"flex", justifyContent:"center", alignItems:"center" }}>
-                  <QRCode value={joinUrl} size={160} />
-                </div>
-              </div>
-              <div style={{ marginTop: 12 }}>
-                <button disabled={!isHost || busy || players.length < 2} onClick={doStart}>
-                  Start game
-                </button>
-                {!isHost && <span className="muted" style={{ marginLeft:10 }}>Waiting for host…</span>}
-              </div>
-            </div>
-          )}
-
-          {room.status === PHASE.FINISHED && (
-            <div style={{ marginTop: 12 }}>
-              <h2>Game finished 🎉</h2>
-              <div className="muted">Winner: {sortedPlayers.sort((a,b)=>(b.score??0)-(a.score??0))[0]?.name}</div>
-            </div>
-          )}
+              );
+            })}
+          </div>
         </div>
 
-        <div className="card">
-          <h2>Round</h2>
+        {/* Main content */}
+        {room.status === PHASE.LOBBY && (
+          <div className="panel">
+            <div className="topRow">
+              <h2 style={{ margin: 0 }}>Lobby</h2>
+              <span className="pill">Players {sortedPlayers.length}</span>
+            </div>
 
-          {!round && room.status !== PHASE.LOBBY && (
-            <div className="muted">Preparing round…</div>
-          )}
+            <div style={{ marginTop: 10 }} className="muted">
+              Share this link (or QR) and start when everyone joined.
+            </div>
 
-          {round && (
-            <div>
-              <div className="muted">Language: {round.lang === "es" ? "Español" : "English"}</div>
-              <div style={{ marginTop: 10 }}>
-                <div className="muted">Word</div>
-                <div style={{ fontSize: 28, fontWeight: 800 }}>{round.word}</div>
+            <div style={{ marginTop: 12 }} className="row">
+              <div className="col">
+                <div className="subcard">
+                  <div className="muted">Join URL</div>
+                  <div style={{ wordBreak: "break-all", marginTop: 6 }}>{joinUrl}</div>
+                </div>
               </div>
+              <div className="col" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <QRCode value={joinUrl} size={160} />
+              </div>
+            </div>
 
-              {isReader && (
-                <div style={{ marginTop: 10 }} className="card">
-                  <div className="muted">Real definition (reader only)</div>
-                  <div style={{ marginTop: 6 }}>{round.realDefinition}</div>
-                </div>
-              )}
+            <div style={{ marginTop: 12 }}>
+              <button disabled={!isHost || busy || players.length < 2} onClick={doStart}>
+                Start game
+              </button>
+              {!isHost && <span className="muted" style={{ marginLeft: 10 }}>Waiting for host…</span>}
+            </div>
+          </div>
+        )}
 
-              {room.status === PHASE.WRITING && (
-                <div style={{ marginTop: 12 }}>
-                  {isReader ? (
-                    <div className="muted">You are the reader. Wait until everyone submits, then advance to voting.</div>
-                  ) : (
-                    <div>
-                      <div className="muted" style={{ marginBottom: 6 }}>Write a believable definition:</div>
-                      <textarea value={myText} onChange={e=>setMyText(e.target.value)} placeholder="Invent a definition that sounds real…" />
-                      <div style={{ marginTop: 10 }}>
-                        <button disabled={busy} onClick={doSubmit}>Submit</button>
-                        <span className="muted" style={{ marginLeft:10 }}>
-                          Submitted: {subs.length}/{players.length - 1} (reader doesn't submit)
-                        </span>
+        {room.status === PHASE.FINISHED && (
+          <div className="panel">
+            <h2 style={{ marginTop: 0 }}>Game finished 🎉</h2>
+            <div className="muted">Winner: {sortedPlayers.sort((a,b)=>(b.score??0)-(a.score??0))[0]?.name}</div>
+          </div>
+        )}
+
+        {room.status !== PHASE.LOBBY && room.status !== PHASE.FINISHED && (
+          <div className="panel">
+            {!round ? (
+              <div className="muted">Preparing round…</div>
+            ) : (
+              <>
+                {/* Word area */}
+                {room.status !== PHASE.WORD_SELECT && (
+                  <div className="wordCard">
+                    <div className="muted">Language: {round.lang === "es" ? "Español" : "English"}</div>
+                    <h2 className="wordTitle">{round.word}</h2>
+                    {isReader && (
+                      <div className="subcard" style={{ marginTop: 10 }}>
+                        <div className="muted">Reader-only: real definition</div>
+                        <div style={{ marginTop: 6, fontWeight: 700 }}>{round.realDefinition}</div>
                       </div>
-                    </div>
-                  )}
-
-                  {isReader && (
-                    <div style={{ marginTop: 12 }}>
-                      <button className="secondary" disabled={busy} onClick={doOpenVoting}>
-                        Open voting
-                      </button>
-                      <div className="muted" style={{ marginTop: 6 }}>
-                        Tip: only open voting after everyone (except reader) submitted.
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {room.status === PHASE.VOTING && (
-                <div style={{ marginTop: 12 }}>
-                  <div className="muted" style={{ marginBottom: 10 }}>
-                    {isReader
-                      ? "You are the reader. Read the options aloud while others vote."
-                      : "Vote for the REAL definition. You can’t vote your own."}
+                    )}
                   </div>
+                )}
 
-                  {options.map((o, idx) => {
-                    const isMine = o.choiceId === uid;
-                    const checked = myVote === o.choiceId;
-                    return (
-                      <div key={o.choiceId} className="option" style={{ opacity: isMine ? .55 : 1, marginBottom: 10 }}>
-                        <div>
-                          {isReader ? (
-                            <div style={{ width: 18 }} />
-                          ) : (
-                            <input
-                              type="radio"
-                              name="vote"
-                              checked={checked}
-                              disabled={isMine || busy}
-                              onChange={() => doVote(o.choiceId)}
-                            />
-                          )}
+                {/* Phase content */}
+                {room.status === PHASE.WORD_SELECT && (
+                  <div style={{ marginTop: 10 }}>
+                    {isReader ? (
+                      <>
+                        <h2 style={{ marginTop: 0 }}>Pick the word</h2>
+                        <div className="muted" style={{ marginBottom: 10 }}>
+                          Read the word aloud (not the definition).
                         </div>
-                        <div>
-                          <strong>Option {idx+1}{isMine ? " (yours)" : ""}</strong>
-                          <div>{o.text}</div>
+                        <div className="homeButtons">
+                          {(round.wordCandidates || []).map(c => (
+                            <button key={c.id} className="bigBtn secondary" disabled={busy} onClick={() => doChooseWord(c.id)}>
+                              <div>
+                                <div style={{ fontSize: 20, fontWeight: 900 }}>{c.word}</div>
+                                <div className="btnHint">Tap to select</div>
+                              </div>
+                              <div aria-hidden style={{ fontSize: 20 }}>✅</div>
+                            </button>
+                          ))}
                         </div>
-                      </div>
-                    );
-                  })}
-
-                  <div className="muted">Votes: {votes.length}/{Math.max(0, players.length - 1)}</div>
-
-                  {isReader && (
-                    <div style={{ marginTop: 12 }}>
-                      <button className="secondary" disabled={busy} onClick={doReveal}>
-                        Reveal + Score
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {room.status === PHASE.REVEAL && (
-                <div style={{ marginTop: 12 }}>
-                  <div className="card" style={{ background:"#f9fafb" }}>
-                    <div className="muted">Correct definition</div>
-                    <div style={{ marginTop: 6, fontWeight: 700 }}>
-                      {round.realDefinition}
-                    </div>
+                      </>
+                    ) : (
+                      <div className="muted">Reader is choosing a word…</div>
+                    )}
                   </div>
+                )}
 
+                {room.status === PHASE.WRITING && (
                   <div style={{ marginTop: 12 }}>
-                    <div className="muted" style={{ marginBottom: 6 }}>How people voted</div>
-                    <ul className="list">
-                      {votes.map(v => {
-                        const voter = players.find(p => p.uid === v.uid)?.name || "Player";
-                        const picked = (v.choiceId === "REAL")
-                          ? "REAL"
-                          : (players.find(p => p.uid === v.choiceId)?.name ? `Fake by ${players.find(p => p.uid === v.choiceId)?.name}` : "Fake");
-                        const ok = v.choiceId === "REAL";
-                        return <li key={v.uid}>{voter}: <strong>{picked}</strong> {ok ? "✅" : "❌"}</li>;
-                      })}
-                    </ul>
+                    {isReader ? (
+                      <>
+                        <div className="muted">You are the reader. Wait for submissions, then open voting.</div>
+                        <div style={{ marginTop: 12 }}>
+                          <button className="secondary" disabled={busy} onClick={doOpenVoting}>Open voting</button>
+                          <div className="muted" style={{ marginTop: 6 }}>
+                            Submitted: {subs.length}/{Math.max(0, players.length - 1)}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="muted" style={{ marginBottom: 6 }}>Write a believable definition:</div>
+                        <textarea value={myText} onChange={(e) => setMyText(e.target.value)} placeholder="Invent a definition that sounds real…" />
+                        <div style={{ marginTop: 10 }}>
+                          <button disabled={busy} onClick={doSubmit}>Submit</button>
+                          <span className="muted" style={{ marginLeft: 10 }}>
+                            Submitted: {subs.length}/{Math.max(0, players.length - 1)}
+                          </span>
+                        </div>
+                      </>
+                    )}
                   </div>
+                )}
 
-                  {isReader && (
-                    <div style={{ marginTop: 12 }}>
-                      <button disabled={busy} onClick={doNext}>
-                        Next round
-                      </button>
+                {room.status === PHASE.VOTING && (
+                  <div style={{ marginTop: 12 }}>
+                    <div className="muted" style={{ marginBottom: 10 }}>
+                      {isReader ? "Reader: read options aloud." : "Vote for the REAL definition (not your own)."}
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
 
-          {err && <div style={{ marginTop: 12, color:"#b91c1c" }}><strong>Error:</strong> {err}</div>}
+                    {options.map((o, idx) => {
+                      const isMine = o.choiceId === uid;
+                      const checked = myVote === o.choiceId;
+                      const label = String.fromCharCode(65 + idx);
+                      return (
+                        <div key={o.choiceId} className={`option ${checked ? "selected" : ""} ${isMine ? "mine" : ""}`} style={{ marginBottom: 10 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                            <div className="pill" style={{ background: "rgba(37,99,235,0.12)" }}>{label}</div>
+                            {!isReader && (
+                              <input
+                                type="radio"
+                                name="vote"
+                                checked={checked}
+                                disabled={isMine || busy}
+                                onChange={() => doVote(o.choiceId)}
+                              />
+                            )}
+                          </div>
+                          <div style={{ marginTop: 8 }}>
+                            <div style={{ fontWeight: 900 }}>Option {label}{isMine ? " (yours)" : ""}</div>
+                            <div>{o.text}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    <div className="muted">Votes: {votes.length}/{Math.max(0, players.length - 1)}</div>
+
+                    {isReader && (
+                      <div style={{ marginTop: 12 }}>
+                        <button className="secondary" disabled={busy} onClick={doReveal}>Reveal + Score</button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {room.status === PHASE.REVEAL && (
+                  <div style={{ marginTop: 12 }}>
+                    <div className="subcard">
+                      <div className="muted">Correct definition</div>
+                      <div style={{ marginTop: 6, fontWeight: 900 }}>{round.realDefinition}</div>
+                    </div>
+
+                    {bestBluff && (
+                      <div className="subcard" style={{ marginTop: 10 }}>
+                        <div className="muted">Best bluff</div>
+                        <div style={{ marginTop: 6, fontWeight: 900 }}>{bestBluff.author} ({bestBluff.votes} votes)</div>
+                        <div style={{ marginTop: 6 }}>{bestBluff.text}</div>
+                      </div>
+                    )}
+
+                    <div style={{ marginTop: 12 }}>
+                      <div className="muted" style={{ marginBottom: 6 }}>Votes</div>
+                      <ul className="list">
+                        {votes.map(v => {
+                          const voter = players.find(p => p.uid === v.uid)?.name || "Player";
+                          const picked = (v.choiceId === "REAL")
+                            ? "REAL"
+                            : (players.find(p => p.uid === v.choiceId)?.name ? `Fake by ${players.find(p => p.uid === v.choiceId)?.name}` : "Fake");
+                          const ok = v.choiceId === "REAL";
+                          return <li key={v.uid}>{voter}: <strong>{picked}</strong> {ok ? "✅" : "❌"}</li>;
+                        })}
+                      </ul>
+                    </div>
+
+                    {isReader && (
+                      <div style={{ marginTop: 12 }}>
+                        <button disabled={busy} onClick={doNext}>Next round</button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+
+            {err && <div style={{ marginTop: 12, color: "#b91c1c" }}><strong>Error:</strong> {err}</div>}
+          </div>
+        )}
+
+        <div style={{ marginTop: 14, color: "rgba(255,255,255,0.75)", fontSize: 13 }}>
+          Scoring: +2 guess real • +1 per vote your fake gets • reader +1 per non‑real vote.
         </div>
-      </div>
-
-      <div style={{ marginTop: 14 }} className="muted">
-        Scoring: +2 if you guess real, +1 for each vote your fake gets, reader gets +1 per non‑real vote.
       </div>
     </div>
   );

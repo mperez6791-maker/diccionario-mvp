@@ -28,9 +28,14 @@ export default function App(){
   if (!user) {
     return (
       <div className="container">
-        <div className="card">
-          <h1>El Diccionario (MVP)</h1>
-          <p className="muted">Signing you in…</p>
+        <div className="shell">
+          <div className="hero">
+            <div className="brandMark">📘</div>
+            <div>
+              <h1 style={{ margin: 0 }}>The Dictionary</h1>
+              <div className="muted">Signing you in…</div>
+            </div>
+          </div>
         </div>
       </div>
     );

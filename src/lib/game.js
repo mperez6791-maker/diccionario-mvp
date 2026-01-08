@@ -9,6 +9,7 @@ import WORDS from "../data/words_pack_core.json";
 
 const PHASE = {
   LOBBY: "lobby",
+  WORD_SELECT: "word_select",
   WRITING: "writing",
   VOTING: "voting",
   REVEAL: "reveal",
@@ -46,6 +47,8 @@ export async function createRoom({ hostUid, hostName, targetScore=50, langMode="
     hostUid,
     targetScore,
     langMode,
+    // v6A: reader gets 5 words to choose from each round.
+    readerChoiceEnabled: true,
     roundIndex: 0,
     readerIndex: 0,
     playerOrder: [hostUid],
@@ -146,7 +149,8 @@ export async function startGame(roomId, hostUid){
     if (room.hostUid !== hostUid) throw new Error("Only host can start");
     if (room.status !== PHASE.LOBBY) return;
 
-    tx.update(roomRef, { status: PHASE.WRITING, lastUpdatedAt: serverTimestamp() });
+    // Round creation will set the correct status.
+    tx.update(roomRef, { lastUpdatedAt: serverTimestamp() });
   });
   // create first round
   await createNextRound(roomId);
@@ -172,9 +176,12 @@ export async function createNextRound(roomId){
     // Avoid repeating words within the same room until we exhaust the pack.
     const used = Array.isArray(room.usedWordIds) ? room.usedWordIds : [];
     const unused = WORDS.filter(w => !used.includes(w.id));
+    const poolReset = unused.length === 0;
     const pool = unused.length ? unused : WORDS;
-    const chosen = pickRandom(pool);
-    const wd = wordForLang(chosen, lang);
+
+    // v6A: show the reader 5 candidate words to choose from.
+    const candidates = shuffle(pool).slice(0, Math.min(5, pool.length));
+    const wordCandidates = candidates.map(w => ({ id: w.id, word: wordForLang(w, lang).word }));
 
     const roundsCol = collection(db, "rooms", roomId, "rounds");
     const roundId = `r${roundIndex+1}`;
@@ -183,21 +190,85 @@ export async function createNextRound(roomId){
     tx.set(roundRef, {
       roundIndex: roundIndex + 1,
       readerUid,
-      wordId: chosen.id,
-      word: wd.word,
-      realDefinition: wd.def,
-      lang: wd.lang,
-      phase: PHASE.WRITING,
+      // word is chosen by reader in WORD_SELECT phase.
+      wordId: null,
+      word: null,
+      realDefinition: null,
+      lang,
+      phase: (room.readerChoiceEnabled ?? true) ? PHASE.WORD_SELECT : PHASE.WRITING,
+      wordCandidates,
+      poolReset,
       createdAt: serverTimestamp(),
     });
 
-    const nextUsed = (unused.length ? [...used, chosen.id] : [chosen.id]);
+    // If readerChoiceEnabled is OFF, immediately pick one.
+    if (!(room.readerChoiceEnabled ?? true)){
+      const chosen = candidates[0] || pickRandom(pool);
+      const wd = wordForLang(chosen, lang);
+      tx.update(roundRef, {
+        wordId: chosen.id,
+        word: wd.word,
+        realDefinition: wd.def,
+        phase: PHASE.WRITING,
+      });
+
+      const nextUsed = (!poolReset ? [...used, chosen.id] : [chosen.id]);
+      tx.update(roomRef, {
+        status: PHASE.WRITING,
+        roundIndex: roundIndex + 1,
+        readerIndex: (readerIndex + 1) % playerOrder.length,
+        currentRoundId: roundId,
+        usedWordIds: nextUsed,
+        lastUpdatedAt: serverTimestamp(),
+      });
+      return;
+    }
 
     tx.update(roomRef, {
-      status: PHASE.WRITING,
+      status: PHASE.WORD_SELECT,
       roundIndex: roundIndex + 1,
       readerIndex: (readerIndex + 1) % playerOrder.length,
       currentRoundId: roundId,
+      lastUpdatedAt: serverTimestamp(),
+    });
+  });
+}
+
+export async function chooseWordForRound(roomId, roundId, actorUid, chosenWordId){
+  const roomRef = doc(db, "rooms", roomId);
+  const roundRef = doc(db, "rooms", roomId, "rounds", roundId);
+  await runTransaction(db, async (tx) => {
+    const roomSnap = await tx.get(roomRef);
+    const roundSnap = await tx.get(roundRef);
+    if (!roomSnap.exists() || !roundSnap.exists()) throw new Error("Missing room/round");
+    const room = roomSnap.data();
+    const round = roundSnap.data();
+    if (round.readerUid !== actorUid) throw new Error("Only the reader can choose the word");
+    if (round.phase !== PHASE.WORD_SELECT) return;
+
+    // round.lang is always a concrete language: "es" or "en"
+    const lang = (round.lang === "es" || round.lang === "en") ? round.lang : "en";
+    const cand = (round.wordCandidates || []).find(c => c.id === chosenWordId);
+    if (!cand) throw new Error("Invalid word choice");
+
+    const entry = WORDS.find(w => w.id === chosenWordId);
+    if (!entry) throw new Error("Word not found");
+    const wd = wordForLang(entry, lang);
+
+    // Update usedWordIds only when a word is actually selected.
+    const used = Array.isArray(room.usedWordIds) ? room.usedWordIds : [];
+    const nextUsed = (round.poolReset ? [chosenWordId] : [...used, chosenWordId]);
+
+    tx.update(roundRef, {
+      wordId: chosenWordId,
+      word: wd.word,
+      realDefinition: wd.def,
+      phase: PHASE.WRITING,
+      chosenAt: serverTimestamp(),
+    });
+
+    tx.update(roomRef, {
+      status: PHASE.WRITING,
       usedWordIds: nextUsed,
       lastUpdatedAt: serverTimestamp(),
     });
