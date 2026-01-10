@@ -6,9 +6,8 @@ export default function Home({ uid, onEnterRoom }) {
   const [mode, setMode] = useState("menu"); // menu | create | join
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
-  const [target, setTarget] = useState(15);
-  const [langMode, setLangMode] = useState("en");
-  const [gameMode, setGameMode] = useState("classic");
+  const [target, setTarget] = useState(50);
+  const [langMode, setLangMode] = useState("both");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -22,9 +21,8 @@ export default function Home({ uid, onEnterRoom }) {
       const { roomId } = await createRoom({
         hostUid: uid,
         hostName: name.trim(),
-        targetScore: Number(target) || 15,
+        targetScore: Number(target) || 50,
         langMode,
-        gameMode,
       });
       onEnterRoom(roomId);
     } catch (e) {
@@ -118,22 +116,15 @@ export default function Home({ uid, onEnterRoom }) {
               {mode === "create" && (
                 <>
                   <div className="col">
-                    <div className="muted" style={{ marginBottom: 6 }}>Game mode</div>
-                    <select value={gameMode} onChange={(e) => setGameMode(e.target.value)}>
-                      <option value="classic">Classic (with Reader)</option>
-                      <option value="no_reader">No Reader (recommended for small groups)</option>
-                    </select>
-                  </div>
-                  <div className="col">
                     <div className="muted" style={{ marginBottom: 6 }}>Target score</div>
-                    <input value={target} onChange={(e) => setTarget(e.target.value)} placeholder="15" />
+                    <input value={target} onChange={(e) => setTarget(e.target.value)} placeholder="50" />
                   </div>
                   <div className="col">
                     <div className="muted" style={{ marginBottom: 6 }}>Language mode</div>
                     <select value={langMode} onChange={(e) => setLangMode(e.target.value)}>
-                      <option value="en">English only</option>
-                      <option value="es">Spanish only</option>
                       <option value="both">Both (ES/EN alternating)</option>
+                      <option value="es">Spanish only</option>
+                      <option value="en">English only</option>
                     </select>
                   </div>
                 </>
