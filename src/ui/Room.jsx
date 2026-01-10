@@ -10,9 +10,11 @@ import {
   startGame,
   submitDefinition,
   openVoting,
+  openReaderReview,
   castVote,
   revealAndScore,
   nextOrFinish,
+  finishGame,
   chooseWordForRound,
 } from "../lib/game";
 import { shuffle } from "../lib/util";
@@ -45,6 +47,8 @@ export default function Room({ uid, roomId, onExit }){
   const [myVote, setMyVote] = useState(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(null); // { missing, proceed }
+  const [showWinner, setShowWinner] = useState(false);
 
   useEffect(() => subscribeRoom(roomId, setRoom), [roomId]);
   useEffect(() => subscribePlayers(roomId, setPlayers), [roomId]);
@@ -57,11 +61,47 @@ export default function Room({ uid, roomId, onExit }){
     return () => { unsubRound(); unsubSubs(); unsubVotes(); };
   }, [roomId, room?.currentRoundId]);
 
+  // Reset per-round local UI state.
+  useEffect(() => {
+    setMyText("");
+    setMyVote(null);
+    setConfirmOpen(null);
+    setErr("");
+  }, [room?.currentRoundId]);
+
+  // Winner celebration overlay (shows immediately after Reveal + Score).
+  useEffect(() => {
+    if (room?.gameOver && room?.winnerUid) setShowWinner(true);
+  }, [room?.gameOver, room?.winnerUid]);
+
+  // No-reader mode: auto-advance phases to avoid deadlocks (no dedicated controller).
+  useEffect(() => {
+    if (!room || !round) return;
+    if ((room.gameMode || "classic") !== "no_reader") return;
+    if (!room.currentRoundId) return;
+
+    const submitted = subs.filter(s => (s.text || "").trim().length > 0).length;
+    const expectedSubs = players.length;
+
+    // When everyone submitted, open voting automatically.
+    if (room.status === PHASE.WRITING && round.phase === PHASE.WRITING && expectedSubs > 0 && submitted >= expectedSubs) {
+      openVoting(roomId, room.currentRoundId, uid).catch(() => {});
+    }
+
+    // When everyone voted, reveal + score automatically.
+    if (room.status === PHASE.VOTING && round.phase === PHASE.VOTING && players.length > 0 && votes.length >= players.length) {
+      revealAndScore(roomId, room.currentRoundId, uid).catch(() => {});
+    }
+  }, [roomId, uid, room, round, subs, votes, players.length]);
+
   const me = useMemo(() => players.find(p => p.uid === uid), [players, uid]);
   const isHost = room?.hostUid === uid;
+  const mode = room?.gameMode || "classic"; // classic | no_reader
+  const isNoReader = mode === "no_reader";
   const currentPhase = room?.status || PHASE.LOBBY;
   const readerUid = round?.readerUid;
   const isReader = readerUid === uid;
+  const isController = isNoReader ? isHost : isReader;
 
   const joinUrl = useMemo(() => {
     const url = new URL(window.location.href);
@@ -76,13 +116,14 @@ export default function Room({ uid, roomId, onExit }){
     const real = { choiceId: "REAL", text: round.realDefinition, authorUid: null, isReal: true };
     const fake = subs
       .filter(s => (s.text||"").trim().length > 0)
+      .filter(s => isNoReader || s.uid !== readerUid)
       .map(s => ({ choiceId: s.uid, authorUid: s.uid, text: s.text, isReal: false }));
 
     if (round.options?.length) {
       return round.options.map(o => ({ ...o, isReal: o.choiceId === round.realChoiceId }));
     }
     return shuffle([real, ...fake]);
-  }, [round, subs]);
+  }, [round, subs, isNoReader, readerUid]);
 
   useEffect(() => {
     const mine = votes.find(v => v.uid === uid);
@@ -97,8 +138,26 @@ export default function Room({ uid, roomId, onExit }){
   }
 
   async function doOpenVoting(){
+    const expected = isNoReader ? players.length : Math.max(0, players.length - 1);
+    const submitted = subs.filter(s => (s.text || "").trim().length > 0).length;
+    const missing = Math.max(0, expected - submitted);
+    if (missing > 0){
+      setConfirmOpen({ missing });
+      return;
+    }
+    await doOpenVotingConfirmed();
+  }
+
+  async function doOpenVotingConfirmed(){
     setErr(""); setBusy(true);
     try { await openVoting(roomId, room.currentRoundId, uid); }
+    catch(e){ setErr(e.message || String(e)); }
+    finally { setBusy(false); }
+  }
+
+  async function doReview(){
+    setErr(""); setBusy(true);
+    try { await openReaderReview(roomId, room.currentRoundId, uid); }
     catch(e){ setErr(e.message || String(e)); }
     finally { setBusy(false); }
   }
@@ -129,7 +188,14 @@ export default function Room({ uid, roomId, onExit }){
     const t = (myText || "").trim();
     if (!t) return setErr("Write a believable definition.");
     setBusy(true);
-    try { await submitDefinition(roomId, room.currentRoundId, uid, t); }
+    try { await submitDefinition(roomId, room.currentRoundId, uid, t); setMyText(""); }
+    catch(e){ setErr(e.message || String(e)); }
+    finally { setBusy(false); }
+  }
+
+  async function doFinishGame(){
+    setErr(""); setBusy(true);
+    try { await finishGame(roomId, uid); }
     catch(e){ setErr(e.message || String(e)); }
     finally { setBusy(false); }
   }
@@ -147,6 +213,7 @@ export default function Room({ uid, roomId, onExit }){
     switch (room?.status) {
       case PHASE.LOBBY: return "Lobby";
       case PHASE.WORD_SELECT: return "Choose word";
+      case PHASE.REVIEW: return "Reader review";
       case PHASE.WRITING: return "Write";
       case PHASE.VOTING: return "Vote";
       case PHASE.REVEAL: return "Results";
@@ -192,11 +259,48 @@ export default function Room({ uid, roomId, onExit }){
   }
 
   const code = room.code;
-  const target = room.targetScore ?? 50;
+  const target = Number(room.targetScore ?? 15);
 
   return (
     <div className="container">
       <div className={`screen bgv${bgKey}`}>
+        {confirmOpen && (
+          <div className="overlay">
+            <div className="modal">
+              <h3 style={{ marginTop: 0 }}>Still waiting…</h3>
+              <div className="muted" style={{ marginTop: 6 }}>
+                Waiting for <strong>{confirmOpen.missing}</strong> player{confirmOpen.missing === 1 ? "" : "s"} to submit a definition.
+              </div>
+              <div style={{ marginTop: 12 }}>Open voting anyway?</div>
+              <div className="modalActions">
+                <button className="secondary" disabled={busy} onClick={() => setConfirmOpen(null)}>Cancel</button>
+                <button disabled={busy} onClick={doOpenVotingConfirmed}>Open voting anyway</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showWinner && room.gameOver && room.winnerUid && (
+          <div className="overlay">
+            <div className="modal" style={{ textAlign: "center" }}>
+              <div aria-hidden style={{ fontSize: 44, lineHeight: 1 }}>🎉</div>
+              <h2 style={{ margin: "10px 0 6px" }}>Winner!</h2>
+              <div style={{ fontSize: 22, fontWeight: 900 }}>
+                {players.find(p => p.uid === room.winnerUid)?.name || "Player"}
+              </div>
+              <div className="muted" style={{ marginTop: 6 }}>
+                Reached the target score ({target}).
+              </div>
+              <div className="modalActions" style={{ justifyContent: "center" }}>
+                <button className="secondary" onClick={() => setShowWinner(false)}>View results</button>
+                {(isController || isHost) && (
+                  <button className="secondary" onClick={doFinishGame}>Finish game</button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="topRow" style={{ marginBottom: 12 }}>
           <div>
             <div style={{ color: "white", fontWeight: 900, fontSize: 16 }}>
@@ -272,7 +376,7 @@ export default function Room({ uid, roomId, onExit }){
         {room.status === PHASE.FINISHED && (
           <div className="panel">
             <h2 style={{ marginTop: 0 }}>Game finished 🎉</h2>
-            <div className="muted">Winner: {sortedPlayers.sort((a,b)=>(b.score??0)-(a.score??0))[0]?.name}</div>
+            <div className="muted">Winner: {players.find(p => p.uid === room.winnerUid)?.name || sortedPlayers[0]?.name || "Player"}</div>
           </div>
         )}
 
@@ -287,7 +391,7 @@ export default function Room({ uid, roomId, onExit }){
                   <div className="wordCard">
                     <div className="muted">Language: {round.lang === "es" ? "Español" : "English"}</div>
                     <h2 className="wordTitle">{round.word}</h2>
-                    {isReader && (
+                    {!isNoReader && isReader && (
                       <div className="subcard" style={{ marginTop: 10 }}>
                         <div className="muted">Reader-only: real definition</div>
                         <div style={{ marginTop: 6, fontWeight: 700 }}>{round.realDefinition}</div>
@@ -325,13 +429,27 @@ export default function Room({ uid, roomId, onExit }){
 
                 {room.status === PHASE.WRITING && (
                   <div style={{ marginTop: 12 }}>
-                    {isReader ? (
+                    {isNoReader ? (
                       <>
-                        <div className="muted">You are the reader. Wait for submissions, then open voting.</div>
+                        <div className="muted" style={{ marginBottom: 6 }}>Write a believable definition:</div>
+                        <textarea value={myText} onChange={(e) => setMyText(e.target.value)} placeholder="Invent a definition that sounds real…" />
+                        <div style={{ marginTop: 10 }}>
+                          <button disabled={busy} onClick={doSubmit}>Submit</button>
+                          <span className="muted" style={{ marginLeft: 10 }}>
+                            Submitted: {subs.filter(s => (s.text||"").trim().length>0).length}/{players.length}
+                          </span>
+                        </div>
+                      </>
+                    ) : isReader ? (
+                      <>
+                        <div className="muted">You are the reader. Review the submissions, then open voting.</div>
                         <div style={{ marginTop: 12 }}>
-                          <button className="secondary" disabled={busy} onClick={doOpenVoting}>Open voting</button>
+                          <button className="secondary" disabled={busy} onClick={doReview}>Review definitions</button>
                           <div className="muted" style={{ marginTop: 6 }}>
-                            Submitted: {subs.length}/{Math.max(0, players.length - 1)}
+                            Submitted: {subs.filter(s => (s.text||"").trim().length>0).length}/{Math.max(0, players.length - 1)}
+                          </div>
+                          <div className="muted" style={{ marginTop: 6 }}>
+                            Tip: you can review even if someone is still typing.
                           </div>
                         </div>
                       </>
@@ -342,7 +460,7 @@ export default function Room({ uid, roomId, onExit }){
                         <div style={{ marginTop: 10 }}>
                           <button disabled={busy} onClick={doSubmit}>Submit</button>
                           <span className="muted" style={{ marginLeft: 10 }}>
-                            Submitted: {subs.length}/{Math.max(0, players.length - 1)}
+                            Submitted: {subs.filter(s => (s.text||"").trim().length>0).length}/{Math.max(0, players.length - 1)}
                           </span>
                         </div>
                       </>
@@ -350,10 +468,44 @@ export default function Room({ uid, roomId, onExit }){
                   </div>
                 )}
 
+                {room.status === PHASE.REVIEW && (
+                  <div style={{ marginTop: 12 }}>
+                    {isReader ? (
+                      <>
+                        <h2 style={{ marginTop: 0 }}>Reader review</h2>
+                        <div className="muted" style={{ marginBottom: 10 }}>
+                          These definitions are private to you. Read them aloud, then open voting for everyone.
+                        </div>
+                        <div>
+                          {subs
+                            .filter(s => (s.text||"").trim().length>0)
+                            .map(s => {
+                              const p = players.find(pp => pp.uid === s.uid);
+                              return (
+                                <div key={s.uid} className="subcard" style={{ marginBottom: 10 }}>
+                                  <div className="muted">{p?.name || "Player"}</div>
+                                  <div style={{ marginTop: 6, fontWeight: 900 }}>{s.text}</div>
+                                </div>
+                              );
+                            })}
+                        </div>
+                        <div style={{ marginTop: 12 }}>
+                          <button className="secondary" disabled={busy} onClick={doOpenVoting}>Open voting</button>
+                          <div className="muted" style={{ marginTop: 6 }}>
+                            Submitted: {subs.filter(s => (s.text||"").trim().length>0).length}/{Math.max(0, players.length - 1)}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="muted">Reader is reviewing definitions… get ready to vote.</div>
+                    )}
+                  </div>
+                )}
+
                 {room.status === PHASE.VOTING && (
                   <div style={{ marginTop: 12 }}>
                     <div className="muted" style={{ marginBottom: 10 }}>
-                      {isReader ? "Reader: read options aloud." : "Vote for the REAL definition (not your own)."}
+                      {!isNoReader && isReader ? "Reader: read options aloud." : "Vote for the REAL definition (not your own)."}
                     </div>
 
                     {options.map((o, idx) => {
@@ -364,7 +516,7 @@ export default function Room({ uid, roomId, onExit }){
                         <div key={o.choiceId} className={`option ${checked ? "selected" : ""} ${isMine ? "mine" : ""}`} style={{ marginBottom: 10 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                             <div className="pill" style={{ background: "rgba(37,99,235,0.12)" }}>{label}</div>
-                            {!isReader && (
+                            {!( !isNoReader && isReader ) && (
                               <input
                                 type="radio"
                                 name="vote"
@@ -382,9 +534,9 @@ export default function Room({ uid, roomId, onExit }){
                       );
                     })}
 
-                    <div className="muted">Votes: {votes.length}/{Math.max(0, players.length - 1)}</div>
+                    <div className="muted">Votes: {votes.length}/{isNoReader ? players.length : Math.max(0, players.length - 1)}</div>
 
-                    {isReader && (
+                    {isController && (
                       <div style={{ marginTop: 12 }}>
                         <button className="secondary" disabled={busy} onClick={doReveal}>Reveal + Score</button>
                       </div>
@@ -421,9 +573,13 @@ export default function Room({ uid, roomId, onExit }){
                       </ul>
                     </div>
 
-                    {isReader && (
+                    {(isController || isHost) && (
                       <div style={{ marginTop: 12 }}>
-                        <button disabled={busy} onClick={doNext}>Next round</button>
+                        {room.gameOver ? (
+                          <button className="secondary" disabled={busy} onClick={doFinishGame}>Finish game</button>
+                        ) : (
+                          <button disabled={busy} onClick={doNext}>Next round</button>
+                        )}
                       </div>
                     )}
                   </div>
@@ -436,7 +592,9 @@ export default function Room({ uid, roomId, onExit }){
         )}
 
         <div style={{ marginTop: 14, color: "rgba(255,255,255,0.75)", fontSize: 13 }}>
-          Scoring: +2 guess real • +1 per vote your fake gets • reader +1 per non‑real vote.
+          {isNoReader
+            ? "Scoring: +2 guess real • +1 per vote your fake gets."
+            : "Scoring: +2 guess real • +1 per vote your fake gets • reader +1 per non‑real vote."}
         </div>
       </div>
     </div>

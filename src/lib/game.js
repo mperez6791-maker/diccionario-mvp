@@ -10,6 +10,7 @@ import WORDS from "../data/words_pack_core.json";
 const PHASE = {
   LOBBY: "lobby",
   WORD_SELECT: "word_select",
+  REVIEW: "review",
   WRITING: "writing",
   VOTING: "voting",
   REVEAL: "reveal",
@@ -36,7 +37,7 @@ function chooseLang(mode, roundIndex){
   return (roundIndex % 2 === 0) ? "es" : "en";
 }
 
-export async function createRoom({ hostUid, hostName, targetScore=50, langMode="both" }){
+export async function createRoom({ hostUid, hostName, targetScore=15, langMode="en", gameMode="classic" }){
   const code = makeRoomCode();
   const roomId = nanoid(10);
   const roomRef = doc(db, "rooms", roomId);
@@ -47,12 +48,15 @@ export async function createRoom({ hostUid, hostName, targetScore=50, langMode="
     hostUid,
     targetScore,
     langMode,
-    // v6A: reader gets 5 words to choose from each round.
-    readerChoiceEnabled: true,
+    gameMode,
+    // v6A: in classic mode, reader gets 5 words to choose from each round.
+    readerChoiceEnabled: gameMode === "classic",
     roundIndex: 0,
     readerIndex: 0,
     playerOrder: [hostUid],
     usedWordIds: [],
+    gameOver: false,
+    winnerUid: null,
     createdAt: serverTimestamp(),
     lastUpdatedAt: serverTimestamp(),
   });
@@ -169,7 +173,8 @@ export async function createNextRound(roomId){
 
     const roundIndex = room.roundIndex || 0;
     const readerIndex = room.readerIndex || 0;
-    const readerUid = playerOrder[readerIndex % playerOrder.length];
+    const gameMode = room.gameMode || "classic"; // "classic" | "no_reader"
+    const readerUid = (gameMode === "classic") ? playerOrder[readerIndex % playerOrder.length] : null;
 
     const lang = chooseLang(room.langMode || "both", roundIndex);
 
@@ -179,7 +184,6 @@ export async function createNextRound(roomId){
     const poolReset = unused.length === 0;
     const pool = unused.length ? unused : WORDS;
 
-    // v6A: show the reader 5 candidate words to choose from.
     const candidates = shuffle(pool).slice(0, Math.min(5, pool.length));
     const wordCandidates = candidates.map(w => ({ id: w.id, word: wordForLang(w, lang).word }));
 
@@ -187,10 +191,39 @@ export async function createNextRound(roomId){
     const roundId = `r${roundIndex+1}`;
 
     const roundRef = doc(roundsCol, roundId);
+    // No-reader mode: system picks a word immediately and everyone writes.
+    if (gameMode === "no_reader"){
+      const chosen = candidates[0] || pickRandom(pool);
+      const wd = wordForLang(chosen, lang);
+      tx.set(roundRef, {
+        roundIndex: roundIndex + 1,
+        readerUid: null,
+        wordId: chosen.id,
+        word: wd.word,
+        realDefinition: wd.def,
+        lang,
+        phase: PHASE.WRITING,
+        wordCandidates: [],
+        poolReset,
+        createdAt: serverTimestamp(),
+      });
+
+      const nextUsed = (!poolReset ? [...used, chosen.id] : [chosen.id]);
+      tx.update(roomRef, {
+        status: PHASE.WRITING,
+        roundIndex: roundIndex + 1,
+        readerIndex: (readerIndex + 1) % playerOrder.length,
+        currentRoundId: roundId,
+        usedWordIds: nextUsed,
+        lastUpdatedAt: serverTimestamp(),
+      });
+      return;
+    }
+
+    // Classic mode: reader chooses the word.
     tx.set(roundRef, {
       roundIndex: roundIndex + 1,
       readerUid,
-      // word is chosen by reader in WORD_SELECT phase.
       wordId: null,
       word: null,
       realDefinition: null,
@@ -280,6 +313,24 @@ export async function submitDefinition(roomId, roundId, uid, text){
   await setDoc(ref, { text: (text || "").trim(), submittedAt: serverTimestamp() }, { merge: true });
 }
 
+export async function openReaderReview(roomId, roundId, actorUid){
+  const roomRef = doc(db, "rooms", roomId);
+  const roundRef = doc(db, "rooms", roomId, "rounds", roundId);
+  await runTransaction(db, async (tx) => {
+    const roomSnap = await tx.get(roomRef);
+    const roundSnap = await tx.get(roundRef);
+    if (!roomSnap.exists() || !roundSnap.exists()) throw new Error("Missing room/round");
+    const room = roomSnap.data();
+    const round = roundSnap.data();
+    if ((room.gameMode || "classic") !== "classic") throw new Error("Review is only for classic mode.");
+    if (round.readerUid !== actorUid) throw new Error("Only the reader can review");
+    if (round.phase !== PHASE.WRITING) return;
+
+    tx.update(roundRef, { phase: PHASE.REVIEW, reviewStartedAt: serverTimestamp() });
+    tx.update(roomRef, { status: PHASE.REVIEW, lastUpdatedAt: serverTimestamp() });
+  });
+}
+
 export async function openVoting(roomId, roundId, actorUid){
   const roomRef = doc(db, "rooms", roomId);
   const roundRef = doc(db, "rooms", roomId, "rounds", roundId);
@@ -289,25 +340,43 @@ export async function openVoting(roomId, roundId, actorUid){
     if (!roomSnap.exists() || !roundSnap.exists()) throw new Error("Missing room/round");
     const room = roomSnap.data();
     const round = roundSnap.data();
-    if (round.readerUid !== actorUid) throw new Error("Only the reader can open voting");
-    if (round.phase !== PHASE.WRITING) return;
+    const mode = room.gameMode || "classic";
+    const isClassic = mode === "classic";
 
-    tx.update(roundRef, { phase: PHASE.VOTING });
+    // Classic: reader opens voting.
+    // No-reader: allow ANY player to advance (prevents deadlocks if the host isn't the active device).
+    const canOpen = isClassic
+      ? (round.readerUid === actorUid)
+      : ((room.playerOrder || []).includes(actorUid));
+    if (!canOpen) throw new Error(isClassic ? "Only the reader can open voting" : "Only a player in the room can open voting");
+
+    // Classic: prefer going through REVIEW, but allow skipping for MVP.
+    if (isClassic){
+      if (round.phase !== PHASE.REVIEW && round.phase !== PHASE.WRITING) return;
+    } else {
+      if (round.phase !== PHASE.WRITING) return;
+    }
+
+    tx.update(roundRef, { phase: PHASE.VOTING, votingOpenedAt: serverTimestamp() });
     tx.update(roomRef, { status: PHASE.VOTING, lastUpdatedAt: serverTimestamp() });
   });
 }
 
 export async function castVote(roomId, roundId, uid, choiceId){
-  // MVP guard: reader doesn't vote
+  // Guard: can't vote for your own fake
+  if (choiceId === uid) throw new Error("You can't vote for your own definition.");
+
+  const roomSnap = await getDoc(doc(db, "rooms", roomId));
   const roundSnap = await getDoc(doc(db, "rooms", roomId, "rounds", roundId));
-  if (roundSnap.exists() && roundSnap.data()?.readerUid === uid){
+  const mode = roomSnap.exists() ? (roomSnap.data()?.gameMode || "classic") : "classic";
+  if (mode === "classic" && roundSnap.exists() && roundSnap.data()?.readerUid === uid){
     throw new Error("Reader cannot vote this round.");
   }
   const ref = doc(db, "rooms", roomId, "rounds", roundId, "votes", uid);
   await setDoc(ref, { choiceId, votedAt: serverTimestamp() }, { merge: true });
 }
 export async function revealAndScore(roomId, roundId, actorUid){
-  // Reader computes options, checks votes, updates scores.
+  // Controller computes options, checks votes, updates scores.
   const roomRef = doc(db, "rooms", roomId);
   const roundRef = doc(db, "rooms", roomId, "rounds", roundId);
 
@@ -317,7 +386,14 @@ export async function revealAndScore(roomId, roundId, actorUid){
     if (!roomSnap.exists() || !roundSnap.exists()) throw new Error("Missing room/round");
     const room = roomSnap.data();
     const round = roundSnap.data();
-    if (round.readerUid !== actorUid) throw new Error("Only the reader can reveal/score");
+    const mode = room.gameMode || "classic";
+    const isClassic = mode === "classic";
+    // Classic: reader reveals.
+    // No-reader: allow ANY player to reveal (paired with transaction phase guard).
+    const canReveal = isClassic
+      ? (round.readerUid === actorUid)
+      : ((room.playerOrder || []).includes(actorUid));
+    if (!canReveal) throw new Error(isClassic ? "Only the reader can reveal/score" : "Only a player in the room can reveal/score");
     if (round.phase !== PHASE.VOTING) return;
 
     const subsCol = collection(db, "rooms", roomId, "rounds", roundId, "submissions");
@@ -330,37 +406,62 @@ export async function revealAndScore(roomId, roundId, actorUid){
 
     const votes = votesSnap.docs.map(d => ({ uid: d.id, ...d.data() }));
 
-    // Build option list: real + all fake submissions EXCEPT reader's submission (reader shouldn't submit)
+    // Build option list: real + all fake submissions.
     const realChoiceId = "REAL";
-    const fake = submissions.map(s => ({ choiceId: s.uid, authorUid: s.uid, text: s.text }));
+    const fake = submissions
+      .filter(s => !isClassic || s.uid !== round.readerUid) // classic: ignore reader submissions (shouldn't happen)
+      .map(s => ({ choiceId: s.uid, authorUid: s.uid, text: s.text }));
     const options = shuffle([{ choiceId: realChoiceId, authorUid: null, text: round.realDefinition }, ...fake]);
 
     // Score rules:
     // +2 for choosing real
     // +1 for each vote your fake definition receives
-    // reader gets +1 for each player who did NOT choose real
-    let realVotes = 0;
+    // reader (classic only) gets +1 for each player who did NOT choose real
+    // IMPORTANT: we compute deltas and (in this same transaction) decide winner using UPDATED scores.
+    const deltas = new Map();
+    const playerOrder = room.playerOrder || [];
+    for (const puid of playerOrder) deltas.set(puid, 0);
 
+    let realVotes = 0;
     for (const v of votes){
-      if (v.choiceId === realChoiceId) realVotes += 1;
-      // give +2 to voter if real
       if (v.choiceId === realChoiceId){
-        const pRef = doc(db, "rooms", roomId, "players", v.uid);
-        tx.update(pRef, { score: increment(2) });
+        realVotes += 1;
+        deltas.set(v.uid, (deltas.get(v.uid) || 0) + 2);
       }
-      // give +1 to author if vote matches fake
       const votedFake = fake.find(f => f.choiceId === v.choiceId);
-      if (votedFake && votedFake.authorUid){
-        const authorRef = doc(db, "rooms", roomId, "players", votedFake.authorUid);
-        tx.update(authorRef, { score: increment(1) });
+      if (votedFake?.authorUid){
+        deltas.set(votedFake.authorUid, (deltas.get(votedFake.authorUid) || 0) + 1);
       }
     }
 
-    const totalVoters = votes.length;
-    const readerBonus = Math.max(0, totalVoters - realVotes);
-    if (readerBonus > 0){
-      const readerRef = doc(db, "rooms", roomId, "players", round.readerUid);
-      tx.update(readerRef, { score: increment(readerBonus) });
+    if (isClassic){
+      const totalVoters = votes.length;
+      const readerBonus = Math.max(0, totalVoters - realVotes);
+      if (round.readerUid){
+        deltas.set(round.readerUid, (deltas.get(round.readerUid) || 0) + readerBonus);
+      }
+    }
+
+    // Compute winner immediately (>= target) based on post-round scores.
+    const target = Number(room.targetScore ?? 15);
+    let winnerUid = null;
+    let topScore = -Infinity;
+    for (const puid of playerOrder){
+      const pRef = doc(db, "rooms", roomId, "players", puid);
+      const pSnap = await tx.get(pRef);
+      const base = pSnap.exists() ? Number(pSnap.data()?.score ?? 0) : 0;
+      const next = base + Number(deltas.get(puid) || 0);
+      if (next > topScore){
+        topScore = next;
+        winnerUid = puid;
+      }
+    }
+
+    // Apply score updates.
+    for (const [puid, delta] of deltas.entries()){
+      if (!delta) continue;
+      const pRef = doc(db, "rooms", roomId, "players", puid);
+      tx.update(pRef, { score: increment(delta) });
     }
 
     tx.update(roundRef, {
@@ -369,47 +470,93 @@ export async function revealAndScore(roomId, roundId, actorUid){
       realChoiceId,
       scoredAt: serverTimestamp(),
     });
-    tx.update(roomRef, { status: PHASE.REVEAL, lastUpdatedAt: serverTimestamp() });
+
+    const willGameOver = (topScore >= target);
+    if (willGameOver && !room.gameOver){
+      tx.update(roomRef, {
+        status: PHASE.REVEAL,
+        gameOver: true,
+        winnerUid: winnerUid || null,
+        lastUpdatedAt: serverTimestamp(),
+      });
+    } else {
+      tx.update(roomRef, { status: PHASE.REVEAL, lastUpdatedAt: serverTimestamp() });
+    }
+  });
+
+  // After scoring, check whether the game is over and set winner immediately.
+  await checkAndSetGameOver(roomId);
+}
+
+async function checkAndSetGameOver(roomId){
+  const roomRef = doc(db, "rooms", roomId);
+  const roomSnap = await getDoc(roomRef);
+  if (!roomSnap.exists()) return;
+  const room = roomSnap.data();
+  if (room.gameOver) return;
+  const target = Number(room.targetScore ?? 15);
+
+  const playersSnap = await getDocs(collection(db, "rooms", roomId, "players"));
+  let winnerUid = null;
+  let top = -1;
+  playersSnap.docs.forEach(d => {
+    const p = d.data();
+    const sc = p.score ?? 0;
+    if (sc > top){ top = sc; winnerUid = d.id; }
+  });
+
+  if (Number(top) >= target){
+    await runTransaction(db, async (tx) => {
+      const r = await tx.get(roomRef);
+      if (!r.exists()) return;
+      const cur = r.data();
+      if (cur.gameOver) return;
+      tx.update(roomRef, { gameOver: true, winnerUid: winnerUid || null, lastUpdatedAt: serverTimestamp() });
+    });
+  }
+}
+
+export async function finishGame(roomId, actorUid){
+  const roomRef = doc(db, "rooms", roomId);
+  await runTransaction(db, async (tx) => {
+    const roomSnap = await tx.get(roomRef);
+    if (!roomSnap.exists()) throw new Error("Room not found");
+    const room = roomSnap.data();
+    const mode = room.gameMode || "classic";
+    const currentRoundId = room.currentRoundId;
+    let readerUid = null;
+    if (currentRoundId){
+      const rSnap = await tx.get(doc(db, "rooms", roomId, "rounds", currentRoundId));
+      readerUid = rSnap.exists() ? rSnap.data()?.readerUid : null;
+    }
+    const can = (mode === "classic") ? (actorUid === readerUid || actorUid === room.hostUid) : (actorUid === room.hostUid);
+    if (!can) throw new Error("Only the game controller can finish the game.");
+    tx.update(roomRef, { status: PHASE.FINISHED, lastUpdatedAt: serverTimestamp() });
   });
 }
 
 export async function nextOrFinish(roomId, actorUid){
   const roomRef = doc(db, "rooms", roomId);
 
-  // decide if anyone reached targetScore
-  const playersSnap = await getDocs(collection(db, "rooms", roomId, "players"));
-  let winner = null;
-  let top = -1;
-  playersSnap.docs.forEach(d => {
-    const p = d.data();
-    if ((p.score ?? 0) > top){
-      top = p.score ?? 0;
-      winner = { uid: d.id, ...p };
-    }
-  });
-
   const roomSnap = await getDoc(roomRef);
-  const target = roomSnap.data()?.targetScore ?? 50;
+  if (!roomSnap.exists()) throw new Error("Room not found");
+  const room = roomSnap.data();
+  // If game over, don't create new rounds.
+  if (room.gameOver) return { finished: true };
 
   // Reader (of the current round) advances. Host is also allowed as a fallback (MVP).
-  const currentRoundId = roomSnap.data()?.currentRoundId;
+  const currentRoundId = room.currentRoundId;
   let currentReaderUid = null;
   if (currentRoundId){
     const rSnap = await getDoc(doc(db, "rooms", roomId, "rounds", currentRoundId));
     currentReaderUid = rSnap.exists() ? rSnap.data()?.readerUid : null;
   }
 
-  const canAdvance = actorUid === roomSnap.data()?.hostUid || (currentReaderUid && actorUid === currentReaderUid);
-  if (!canAdvance) throw new Error("Only the reader can advance to the next round.");
-
-  if (top >= target){
-    await runTransaction(db, async (tx) => {
-      const r = await tx.get(roomRef);
-      if (!r.exists()) return;
-      tx.update(roomRef, { status: PHASE.FINISHED, winnerUid: winner?.uid || null, lastUpdatedAt: serverTimestamp() });
-    });
-    return { finished: true, winner };
-  }
+  const mode = room.gameMode || "classic";
+  const canAdvance = (mode === "classic")
+    ? (actorUid === room.hostUid || (currentReaderUid && actorUid === currentReaderUid))
+    : ((room.playerOrder || []).includes(actorUid));
+  if (!canAdvance) throw new Error(mode === "classic" ? "Only the reader can advance to the next round." : "Only a player in the room can advance to the next round.");
 
   await createNextRound(roomId);
   return { finished: false };
